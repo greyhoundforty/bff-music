@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;}
+  html,body{margin:0;}
+  body{background:#F1EADD;}
+  ::selection{background:#F4E7C2;}
+  ::-webkit-scrollbar{height:9px;width:9px;}
+  ::-webkit-scrollbar-thumb{background:#d8cfbd;border-radius:6px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+  button{font-family:inherit;}
+</style>
+</helmet>
+
+<div style="min-height:100vh;background-color:#F1EADD;background-image:radial-gradient(rgba(34,31,27,.022) 1px, transparent 1px);background-size:3px 3px;font-family:'Hanken Grotesk',-apple-system,sans-serif;color:#221F1B;-webkit-font-smoothing:antialiased;">
+
+  <sc-if value="{{ notLogin }}">
+  <div style="position:sticky;top:0;z-index:30;background:rgba(241,234,221,.82);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid #E3DBCC;">
+    <div style="max-width:1140px;margin:0 auto;display:flex;align-items:center;gap:20px;padding:13px 28px;">
+      <div onClick="{{ goHome }}" style="display:flex;align-items:center;gap:11px;cursor:pointer;">
+        <div style="display:flex;gap:3px;">
+          <span style="width:21px;height:21px;border-radius:6px;background:#C2902F;display:flex;align-items:center;justify-content:center;color:#FBF6EA;font-size:11px;">&#9733;</span>
+          <span style="width:21px;height:21px;border-radius:6px;background:#CC6B52;display:flex;align-items:center;justify-content:center;color:#FBF6EA;font-size:11px;">&#9829;</span>
+          <span style="width:21px;height:21px;border-radius:6px;background:#2E9E78;display:flex;align-items:center;justify-content:center;color:#FBF6EA;font-size:11px;">&#9312;</span>
+        </div>
+        <span style="font-family:'Instrument Serif',serif;font-size:27px;line-height:1;letter-spacing:.3px;">BFF</span>
+      </div>
+      <nav style="display:flex;gap:2px;margin-left:10px;">
+        <button onClick="{{ goHome }}" style="position:relative;font-size:15px;font-weight:500;color:#3A352E;background:none;border:none;padding:7px 12px;cursor:pointer;">Discover<sc-if value="{{ isHome }}"><span style="position:absolute;left:12px;right:12px;bottom:-14px;height:2.5px;border-radius:3px;background:#221F1B;"></span></sc-if></button>
+        <button onClick="{{ goArtist }}" style="position:relative;font-size:15px;font-weight:500;color:#3A352E;background:none;border:none;padding:7px 12px;cursor:pointer;">Artists<sc-if value="{{ isArtist }}"><span style="position:absolute;left:12px;right:12px;bottom:-14px;height:2.5px;border-radius:3px;background:#221F1B;"></span></sc-if></button>
+        <button onClick="{{ goProfile }}" style="position:relative;font-size:15px;font-weight:500;color:#3A352E;background:none;border:none;padding:7px 12px;cursor:pointer;">You<sc-if value="{{ isProfile }}"><span style="position:absolute;left:12px;right:12px;bottom:-14px;height:2.5px;border-radius:3px;background:#221F1B;"></span></sc-if></button>
+      </nav>
+      <div style="flex:1 1 auto;"></div>
+      <div style="display:flex;align-items:center;gap:9px;background:#FBF8F1;border:1px solid #E3DBCC;border-radius:11px;padding:9px 13px;min-width:248px;color:#9A9183;font-size:14px;">
+        <span style="font-size:14px;">&#9906;</span><span>search artists, albums, people</span>
+      </div>
+      <span onClick="{{ goLogin }}" style="font-size:13px;color:#9A9183;cursor:pointer;white-space:nowrap;">Sign out</span>
+      <div onClick="{{ goProfile }}" style="width:38px;height:38px;border-radius:50%;background:#E7D7B8;display:flex;align-items:center;justify-content:center;font-family:'Instrument Serif',serif;font-size:20px;color:#3A352E;cursor:pointer;flex:0 0 auto;">Y</div>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ notLogin }}">
+  <div style="max-width:1140px;margin:0 auto;padding:34px 28px 90px;">
+
+    <!-- ============ HOME ============ -->
+    <sc-if value="{{ isHome }}">
+    <div data-screen-label="Home &middot; Discover">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:26px;">
+        <div>
+          <div style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;color:#9A9183;text-transform:uppercase;margin-bottom:4px;">What people are naming</div>
+          <div style="font-family:'Instrument Serif',serif;font-size:46px;line-height:.95;">Discover</div>
+        </div>
+        <div style="display:inline-flex;background:#E9E0D0;border:1px solid #E3DBCC;border-radius:12px;padding:3px;font-size:14px;">
+          <sc-if value="{{ isFollowing }}"><button onClick="{{ tabFollowing }}" style="background:#FBF8F1;border:none;border-radius:9px;padding:7px 17px;font-weight:600;color:#221F1B;box-shadow:0 1px 2px rgba(34,31,27,.1);cursor:pointer;">Following</button></sc-if>
+          <sc-if value="{{ isEveryone }}"><button onClick="{{ tabFollowing }}" style="background:none;border:none;border-radius:9px;padding:7px 17px;color:#6A645A;cursor:pointer;">Following</button></sc-if>
+          <sc-if value="{{ isEveryone }}"><button onClick="{{ tabEveryone }}" style="background:#FBF8F1;border:none;border-radius:9px;padding:7px 17px;font-weight:600;color:#221F1B;box-shadow:0 1px 2px rgba(34,31,27,.1);cursor:pointer;">Everyone</button></sc-if>
+          <sc-if value="{{ isFollowing }}"><button onClick="{{ tabEveryone }}" style="background:none;border:none;border-radius:9px;padding:7px 17px;color:#6A645A;cursor:pointer;">Everyone</button></sc-if>
+        </div>
+      </div>
+
+      <!-- COLUMNS -->
+      <sc-if value="{{ isCols }}">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;align-items:start;">
+        <div style="display:flex;flex-direction:column;gap:13px;">
+          <div style="display:flex;align-items:center;gap:11px;padding-bottom:11px;border-bottom:1.5px solid #E3DBCC;">
+            <span style="width:32px;height:32px;border-radius:10px;background:#C2902F;color:#FBF6EA;display:flex;align-items:center;justify-content:center;font-size:15px;flex:0 0 auto;">&#9733;</span>
+            <span style="font-family:'Instrument Serif',serif;font-size:28px;line-height:1;">Best</span>
+            <span style="font-family:'Space Mono',monospace;font-size:11px;color:#9A9183;margin-left:auto;">the peak</span>
+          </div>
+          <sc-for list="{{ bests }}" as="b" hint-placeholder-count="3">
+            <div style="background:#FBF8F1;border:1px solid #E7DFD0;border-radius:15px;padding:13px;display:flex;gap:13px;align-items:center;box-shadow:0 1px 2px rgba(34,31,27,.04);">
+              <div style="width:60px;height:60px;flex:0 0 auto;position:relative;border-radius:9px;overflow:hidden;background:{{ b.cover }};box-shadow:inset 0 0 0 1px rgba(0,0,0,.07);"><div style="position:absolute;right:-16%;top:-16%;width:60%;height:60%;border-radius:50%;background:rgba(255,250,238,.16);"></div><div style="position:absolute;left:9%;bottom:11%;width:34%;height:34%;border-radius:50%;background:rgba(0,0,0,.15);"></div></div>
+              <div style="min-width:0;flex:1 1 auto;">
+                <div style="font-size:16px;font-weight:600;line-height:1.15;">{{ b.al }}</div>
+                <div style="font-size:13px;color:#6A645A;">{{ b.ar }}</div>
+                <div style="font-family:'Space Mono',monospace;font-size:11px;color:#9A9183;margin-top:5px;">@{{ b.hh }} &middot; {{ b.tm }}</div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:13px;">
+          <div style="display:flex;align-items:center;gap:11px;padding-bottom:11px;border-bottom:1.5px solid #E3DBCC;">
+            <span style="width:32px;height:32px;border-radius:10px;background:#CC6B52;color:#FBF6EA;display:flex;align-items:center;justify-content:center;font-size:15px;flex:0 0 auto;">&#9829;</span>
+            <span style="font-family:'Instrument Serif',serif;font-size:28px;line-height:1;">Favorite</span>
+            <span style="font-family:'Space Mono',monospace;font-size:11px;color:#9A9183;margin-left:auto;">yours</span>
+          </div>
+          <sc-for list="{{ favs }}" as="b" hint-placeholder-count="3">
+            <div style="background:#FBF8F1;border:1px solid #E7DFD0;border-radius:15px;padding:13px;display:flex;gap:13px;align-items:center;box-shadow:0 1px 2px rgba(34,31,27,.04);">
+              <div style="width:60px;height:60px;flex:0 0 auto;position:relative;border-radius:9px;overflow:hidden;background:{{ b.cover }};box-shadow:inset 0 0 0 1px rgba(0,0,0,.07);"><div style="position:absolute;right:-16%;top:-16%;width:60%;height:60%;border-radius:50%;background:rgba(255,250,238,.16);"></div><div style="position:absolute;left:9%;bottom:11%;width:34%;height:34%;border-radius:50%;background:rgba(0,0,0,.15);"></div></div>
+              <div style="min-width:0;flex:1 1 auto;">
+                <div style="font-size:16px;font-weight:600;line-height:1.15;">{{ b.al }}</div>
+                <div style="font-size:13px;color:#6A645A;">{{ b.ar }}</div>
+                <div style="font-family:'Space Mono',monospace;font-size:11px;color:#9A9183;margin-top:5px;">@{{ b.hh }} &middot; {{ b.tm }}</div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:13px;">
+          <div style="display:flex;align-items:center;gap:11px;padding-bottom:11px;border-bottom:1.5px solid #E3DBCC;">
+            <span style="width:32px;height:32px;border-radius:10px;background:#2E9E78;color:#FBF6EA;display:flex;align-items:center;justify-content:center;font-size:15px;flex:0 0 auto;">&#9312;</span>
+            <span style="font-family:'Instrument Serif',serif;font-size:28px;line-height:1;">First</span>
+            <span style="font-family:'Space Mono',monospace;font-size:11px;color:#9A9183;margin-left:auto;">start here</span>
+          </div>
+          <sc-for list="{{ firsts }}" as="b" hint-placeholder-count="3">
+            <div style="background:#FBF8F1;border:1px solid #E7DFD0;border-radius:15px;padding:13px;display:flex;gap:13px;align-items:center;box-shadow:0 1px 2px rgba(34,31,27,.04);">
+              <div style="width:60px;height:60px;flex:0 0 auto;position:relative;border-radius:9px;overflow:hidden;background:{{ b.cover }};box-shadow:inset 0 0 0 1px rgba(0,0,0,.07);"><div style="position:absolute;right:-16%;top:-16%;width:60%;height:60%;border-radius:50%;background:rgba(255,250,238,.16);"></div><div style="position:absolute;left:9%;bottom:11%;width:34%;height:34%;border-radius:50%;background:rgba(0,0,0,.15);"></div></div>
+              <div style="min-width:0;flex:1 1 auto;">
+                <div style="font-size:16px;font-weight:600;line-height:1.15;">{{ b.al }}</div>
+                <div style="font-size:13px;color:#6A645A;">{{ b.ar }}</div>
+                <div style="font-family:'Space Mono',monospace;font-size:11px;color:#9A9183;margin-top:5px;">@{{ b.hh }} &middot; {{ b.tm }}</div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- GRID -->
+      <sc-if value="{{ isGrid }}">
+      <div style="display:flex;gap:9px;overflow:hidden;padding-bottom:18px;margin-bottom:22px;border-bottom:1.5px solid #E3DBCC;">
+        <sc-for list="{{ people }}" as="pp" hint-placeholder-count="7">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:7px;width:66px;flex:0 0 auto;">
+            <div style="width:54px;height:54px;border-radius:50%;background:{{ pp.av }};display:flex;align-items:center;justify-content:center;font-family:'Instrument Serif',serif;font-size:23px;color:#3A352E;">{{ pp.i }}</div>
+            <span style="font-size:12px;color:#6A645A;max-width:64px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">@{{ pp.hh }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px;">
+        <sc-for list="{{ activity }}" as="a" hint-placeholder-count="6">
+          <div style="border:1px solid #E7DFD0;border-radius:16px;background:#FBF8F1;padding:13px;display:flex;flex-direction:column;gap:10px;box-shadow:0 1px 2px rgba(34,31,27,.04);">
+            <div style="position:relative;aspect-ratio:1/1;border-radius:11px;overflow:hidden;background:{{ a.cover }};box-shadow:inset 0 0 0 1px rgba(0,0,0,.07);">
+              <div style="position:absolute;right:-14%;top:-14%;width:54%;height:54%;border-radius:50%;background:rgba(255,250,238,.15);"></div>
+              <div style="position:absolute;left:10%;bottom:12%;width:30%;height:30%;border-radius:50%;background:rgba(0,0,0,.15);"></div>
+              <span style="position:absolute;left:11px;top:11px;display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:3px 9px;border-radius:8px;background:{{ a.tBg }};color:{{ a.tFg }};">{{ a.tGlyph }} {{ a.tLabel }}</span>
+            </div>
+            <div>
+              <div style="font-size:17px;font-weight:600;line-height:1.15;">{{ a.al }}</div>
+              <div style="font-size:13px;color:#6A645A;">{{ a.ar }}</div>
+            </div>
+            <div style="font-family:'Space Mono',monospace;font-size:11px;color:#9A9183;display:flex;align-items:center;gap:8px;">
+              <span style="width:20px;height:20px;border-radius:50%;background:{{ a.av }};display:inline-flex;align-items:center;justify-content:center;font-family:'Instrument Serif',serif;font-size:12px;color:#3A352E;">{{ a.i }}</span>
+              @{{ a.hh }} &middot; {{ a.tm }}
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      </sc-if>
+
+      <!-- TIMELINE -->
+      <sc-if value="{{ isTimeline }}">
+      <div style="display:flex;gap:26px;align-items:flex-start;">
+        <div style="flex:1 1 auto;display:flex;flex-direction:column;gap:15px;min-width:0;">
+          <sc-for list="{{ activity }}" as="a" hint-placeholder-count="5">
+            <div style="border:1px solid #E7DFD0;border-radius:16px;background:#FBF8F1;padding:16px;display:flex;gap:14px;box-shadow:0 1px 2px rgba(34,31,27,.04);">
+              <div style="width:44px;height:44px;flex:0 0 auto;border-radius:50%;background:{{ a.av }};display:flex;align-items:center;justify-content:center;font-family:'Instrument Serif',serif;font-size:21px;color:#3A352E;">{{ a.i }}</div>
+              <div style="flex:1 1 auto;min-width:0;">
+                <div style="font-size:16px;line-height:1.5;color:#3A352E;"><strong style="color:#221F1B;">@{{ a.hh }}</strong> named <strong style="color:#221F1B;">{{ a.al }}</strong> their <span style="display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:600;padding:1px 9px;border-radius:8px;background:{{ a.tBg }};color:{{ a.tFg }};white-space:nowrap;">{{ a.tGlyph }} {{ a.tLabel }}</span> for {{ a.ar }}</div>
+                <div style="font-family:'Instrument Serif',serif;font-style:italic;font-size:20px;color:#4A453D;margin-top:9px;line-height:1.35;">&ldquo;{{ a.note }}&rdquo;</div>
+                <div style="display:flex;gap:18px;align-items:center;margin-top:11px;font-family:'Space Mono',monospace;font-size:12px;color:#9A9183;"><span>&#9825; 12</span><span>&#8617; reply</span><span>{{ a.tm }} ago</span></div>
+              </div>
+              <div style="width:78px;height:78px;flex:0 0 auto;position:relative;border-radius:11px;overflow:hidden;background:{{ a.cover }};box-shadow:inset 0 0 0 1px rgba(0,0,0,.07);"><div style="position:absolute;right:-14%;top:-14%;width:54%;height:54%;border-radius:50%;background:rgba(255,250,238,.15);"></div><div style="position:absolute;left:10%;bottom:12%;width:30%;height:30%;border-radius:50%;background:rgba(0,0,0,.15);"></div></div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="flex:0 0 252px;display:flex;flex-direction:column;gap:16px;position:sticky;top:88px;">
+          <div style="border:1px solid #E7DFD0;border-radius:16px;background:#FBF8F1;padding:16px;">
+            <div style="font-family:'Instrument Serif',serif;font-size:22px;margin-bottom:11px;">People you follow</div>
+            <sc-for list="{{ people }}" as="pp" hint-placeholder-count="6">
+              <div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-top:1px solid #EEE7D8;">
+                <div style="width:30px;height:30px;border-radius:50%;background:{{ pp.av }};display:flex;align-items:center;justify-content:center;font-family:'Instrument Serif',serif;font-size:15px;color:#3A352E;">{{ pp.i }}</div>
+                <span style="font-size:14px;color:#4A453D;">@{{ pp.hh }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="border:1px solid #E7DFD0;border-radius:16px;background:#FBF8F1;padding:16px;">
+            <div style="font-family:'Instrument Serif',serif;font-size:22px;margin-bottom:9px;">Discover artists</div>
+            <div style="font-size:14px;color:#6A645A;line-height:2;">Radiohead<br>Frank Ocean<br>Fleetwood Mac<br><span style="color:#9A9183;">+ find more &rsaquo;</span></div>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+    </div>
+    </sc-if>
+
+    <!-- ============ ARTIST ============ -->
+    <sc-if value="{{ isArtist }}">
+    <div data-screen-label="Artist &middot; Radiohead">
+      <div style="display:flex;gap:20px;align-items:flex-end;margin-bottom:28px;">
+        <div style="width:120px;height:120px;flex:0 0 auto;position:relative;border-radius:16px;overflow:hidden;background:#27374C;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);"><div style="position:absolute;right:-12%;top:-12%;width:52%;height:52%;border-radius:50%;background:rgba(255,250,238,.16);"></div><div style="position:absolute;left:12%;bottom:14%;width:32%;height:32%;border-radius:50%;background:rgba(0,0,0,.18);"></div></div>
+        <div style="flex:1 1 auto;">
+          <div style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;color:#9A9183;text-transform:uppercase;">Artist</div>
+          <div style="font-family:'Instrument Serif',serif;font-size:56px;line-height:.92;">Radiohead</div>
+          <div style="font-size:15px;color:#6A645A;margin-top:8px;">9 albums &middot; 4,210 taggers &middot; <strong style="color:#221F1B;">you've set 2 of 3</strong></div>
+        </div>
+      </div>
+
+      <!-- SLOTS -->
+      <sc-if value="{{ isSlots }}">
+        <div style="font-family:'Instrument Serif',serif;font-size:26px;margin-bottom:4px;">Set your three</div>
+        <div style="font-size:14px;color:#6A645A;margin-bottom:16px;">Drag an album into each slot &mdash; one per slot, swap anytime.</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:30px;">
+          <div style="border:1px solid #E7DFD0;border-top:3px solid #C2902F;border-radius:16px;padding:15px;background:#FBF8F1;box-shadow:0 1px 2px rgba(34,31,27,.04);">
+            <div style="display:flex;align-items:center;gap:9px;margin-bottom:13px;"><span style="width:26px;height:26px;border-radius:8px;background:#C2902F;color:#FBF6EA;display:flex;align-items:center;justify-content:center;font-size:13px;">&#9733;</span><span style="font-family:'Instrument Serif',serif;font-size:22px;">Best</span></div>
+            <div style="display:flex;gap:12px;align-items:center;">
+              <div style="width:62px;height:62px;flex:0 0 auto;position:relative;border-radius:9px;overflow:hidden;background:#9A4327;box-shadow:inset 0 0 0 1px rgba(0,0,0,.07);"><div style="position:absolute;right:-16%;top:-16%;width:60%;height:60%;border-radius:50%;background:rgba(255,250,238,.16);"></div><div style="position:absolute;left:9%;bottom:11%;width:34%;height:34%;border-radius:50%;background:rgba(0,0,0,.15);"></div></div>
+              <div style="min-width:0;"><div style="font-size:17px;font-weight:600;">OK Computer</div><div style="font-size:13px;color:#6A645A;">1997</div><div style="font-size:12px;color:#9A9183;margin-top:4px;cursor:pointer;text-decoration:underline;">replace</div></div>
+            </div>
+          </div>
+          <div style="border:1px solid #E7DFD0;border-top:3px solid #CC6B52;border-radius:16px;padding:15px;background:#FBF8F1;box-shadow:0 1px 2px rgba(34,31,27,.04);">
+            <div style="display:flex;align-items:center;gap:9px;margin-bottom:13px;"><span style="width:26px;height:26px;border-radius:8px;background:#CC6B52;color:#FBF6EA;display:flex;align-items:center;justify-content:center;font-size:13px;">&#9829;</span><span style="font-family:'Instrument Serif',serif;font-size:22px;">Favorite</span></div>
+            <div style="border:1.5px dashed #C8BFAD;border-radius:11px;padding:18px 12px;text-align:center;color:#9A9183;"><div style="font-size:26px;line-height:1;color:#C8BFAD;">&#8595;</div><div style="font-size:15px;margin-top:6px;color:#6A645A;">Drag an album here</div><div style="font-family:'Space Mono',monospace;font-size:11px;margin-top:2px;">or pick from below</div></div>
+          </div>
+          <div style="border:1px solid #E7DFD0;border-top:3px solid #2E9E78;border-radius:16px;padding:15px;background:#FBF8F1;box-shadow:0 1px 2px rgba(34,31,27,.04);">
+            <div style="display:flex;align-items:center;gap:9px;margin-bottom:13px;"><span style="width:26px;height:26px;border-radius:8px;background:#2E9E78;color:#FBF6EA;display:flex;align-items:center;justify-content:center;font-size:13px;">&#9312;</span><span style="font-family:'Instrument Serif',serif;font-size:22px;">First</span></div>
+            <div style="display:flex;gap:12px;align-items:center;">
+              <div style="width:62px;height:62px;flex:0 0 auto;position:relative;border-radius:9px;overflow:hidden;background:#69703F;box-shadow:inset 0 0 0 1px rgba(0,0,0,.07);"><div style="position:absolute;right:-16%;top:-16%;width:60%;height:60%;border-radius:50%;background:rgba(255,250,238,.16);"></div><div style="position:absolute;left:9%;bottom:11%;width:34%;height:34%;border-radius:50%;background:rgba(0,0,0,.15);"></div></div>
+              <div style="min-width:0;"><div style="font-size:17px;font-weight:600;">The Bends</div><div style="font-size:13px;color:#6A645A;">1995</div><div style="font-family:'Space Mono',monospace;font-size:11px;color:#9A9183;margin-top:4px;">newcomers see this</div></div>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:14px;"><span style="font-family:'Instrument Serif',serif;font-size:22px;">Discography</span><span style="font-family:'Space Mono',monospace;font-size:11px;color:#9A9183;">drag a card up, or use &middot;&middot;&middot;</span></div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;">
+          <sc-for list="{{ disco }}" as="d" hint-placeholder-count="9">
+            <div style="border:1px solid #E7DFD0;border-radius:13px;background:#FBF8F1;padding:11px;display:flex;gap:12px;align-items:center;box-shadow:0 1px 2px rgba(34,31,27,.04);">
+              <span style="font-size:15px;color:#C8BFAD;cursor:grab;">&#8942;&#8942;</span>
+              <div style="width:46px;height:46px;flex:0 0 auto;position:relative;border-radius:7px;overflow:hidden;background:{{ d.cover }};box-shadow:inset 0 0 0 1px rgba(0,0,0,.07);"><div style="position:absolute;right:-16%;top:-16%;width:60%;height:60%;border-radius:50%;background:rgba(255,250,238,.16);"></div><div style="position:absolute;left:9%;bottom:11%;width:34%;height:34%;border-radius:50%;background:rgba(0,0,0,.15);"></div></div>
+              <div style="flex:1 1 auto;min-width:0;"><div style="font-size:15px;font-weight:600;line-height:1.1;">{{ d.al }}</div><div style="font-family:'Space Mono',monospace;font-size:11px;color:#9A9183;">{{ d.y }}</div></div>
+              <sc-if value="{{ d.tLabel }}"><span style="width:22px;height:22px;border-radius:7px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-size:11px;background:{{ d.tBg }};color:{{ d.tFg }};">{{ d.tGlyph }}</span></sc-if>
+              <span style="font-size:17px;color:#B7AE9C;cursor:pointer;">&middot;&middot;&middot;</span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <!-- TOGGLES -->
+      <sc-if value="{{ isToggles }}">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;border:1px solid #E7DFD0;border-radius:13px;background:#FBF8F1;padding:11px 15px;margin-bottom:16px;">
+          <span style="font-family:'Instrument Serif',serif;font-size:20px;margin-right:2px;">Your picks</span>
+          <span style="display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:600;padding:3px 10px;border-radius:8px;background:#F4E7C2;color:#6E4E12;">&#9733; OK Computer</span>
+          <span style="display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:600;padding:3px 10px;border-radius:8px;background:#F6D9CD;color:#7A3322;">&#9829; In Rainbows</span>
+          <span style="display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:600;padding:3px 10px;border-radius:8px;background:#CFEADD;color:#1F5A40;">&#9312; The Bends</span>
+        </div>
+        <div style="font-size:14px;color:#6A645A;margin-bottom:14px;">Tap a tag on any album &mdash; each tag sticks to just one.</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;">
+          <sc-for list="{{ disco }}" as="d" hint-placeholder-count="9">
+            <div style="border:1px solid #E7DFD0;border-radius:14px;background:#FBF8F1;padding:13px;display:flex;flex-direction:column;gap:11px;box-shadow:0 1px 2px rgba(34,31,27,.04);">
+              <div style="display:flex;gap:11px;align-items:center;">
+                <div style="width:48px;height:48px;flex:0 0 auto;position:relative;border-radius:8px;overflow:hidden;background:{{ d.cover }};box-shadow:inset 0 0 0 1px rgba(0,0,0,.07);"><div style="position:absolute;right:-16%;top:-16%;width:60%;height:60%;border-radius:50%;background:rgba(255,250,238,.16);"></div><div style="position:absolute;left:9%;bottom:11%;width:34%;height:34%;border-radius:50%;background:rgba(0,0,0,.15);"></div></div>
+                <div style="min-width:0;"><div style="font-size:15px;font-weight:600;line-height:1.1;">{{ d.al }}</div><div style="font-family:'Space Mono',monospace;font-size:11px;color:#9A9183;">{{ d.y }}</div></div>
+              </div>
+              <div style="display:flex;gap:7px;">
+                <sc-if value="{{ d.isBest }}"><span style="flex:1;text-align:center;font-size:12px;font-weight:600;padding:5px 0;border-radius:8px;background:#F4E7C2;color:#6E4E12;">&#9733; Best</span></sc-if>
+                <sc-if value="{{ d.nBest }}"><span style="flex:1;text-align:center;font-size:12px;padding:5px 0;border-radius:8px;border:1px solid #E3DBCC;background:#FBF8F1;color:#9A9183;cursor:pointer;">&#9733; Best</span></sc-if>
+                <sc-if value="{{ d.isFav }}"><span style="flex:1;text-align:center;font-size:12px;font-weight:600;padding:5px 0;border-radius:8px;background:#F6D9CD;color:#7A3322;">&#9829; Fav</span></sc-if>
+                <sc-if value="{{ d.nFav }}"><span style="flex:1;text-align:center;font-size:12px;padding:5px 0;border-radius:8px;border:1px solid #E3DBCC;background:#FBF8F1;color:#9A9183;cursor:pointer;">&#9829; Fav</span></sc-if>
+                <sc-if value="{{ d.isFirst }}"><span style="flex:1;text-align:center;font-size:12px;font-weight:600;padding:5px 0;border-radius:8px;background:#CFEADD;color:#1F5A40;">&#9312; First</span></sc-if>
+                <sc-if value="{{ d.nFirst }}"><span style="flex:1;text-align:center;font-size:12px;padding:5px 0;border-radius:8px;border:1px solid #E3DBCC;background:#FBF8F1;color:#9A9183;cursor:pointer;">&#9312; First</span></sc-if>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <!-- GUIDED -->
+      <sc-if value="{{ isGuided }}">
+        <div style="max-width:780px;">
+          <div style="margin-bottom:22px;">
+            <div style="font-family:'Instrument Serif',serif;font-size:25px;margin-bottom:11px;"><span style="color:#9A9183;">1.</span> Which album is their <span style="background:#F4E7C2;color:#6E4E12;padding:1px 9px;border-radius:8px;">best</span>?</div>
+            <div style="display:flex;gap:13px;overflow-x:auto;padding:2px 2px 12px;">
+              <sc-for list="{{ disco }}" as="d" hint-placeholder-count="6">
+                <div style="width:94px;flex:0 0 auto;">
+                  <div style="width:94px;height:94px;position:relative;border-radius:11px;overflow:hidden;background:{{ d.cover }};box-shadow:inset 0 0 0 1px rgba(0,0,0,.07);"><div style="position:absolute;right:-14%;top:-14%;width:54%;height:54%;border-radius:50%;background:rgba(255,250,238,.15);"></div><div style="position:absolute;left:10%;bottom:12%;width:30%;height:30%;border-radius:50%;background:rgba(0,0,0,.15);"></div><sc-if value="{{ d.isBest }}"><span style="position:absolute;inset:0;border:3px solid #C2902F;border-radius:11px;"></span><span style="position:absolute;left:6px;top:6px;font-size:12px;background:#C2902F;color:#FBF6EA;border-radius:7px;padding:1px 6px;">&#9733;</span></sc-if></div>
+                  <div style="font-size:12px;color:#6A645A;margin-top:6px;line-height:1.15;">{{ d.al }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="margin-bottom:22px;">
+            <div style="font-family:'Instrument Serif',serif;font-size:25px;margin-bottom:11px;"><span style="color:#9A9183;">2.</span> Your personal <span style="background:#F6D9CD;color:#7A3322;padding:1px 9px;border-radius:8px;">favorite</span>?</div>
+            <div style="display:flex;gap:13px;overflow-x:auto;padding:2px 2px 12px;">
+              <sc-for list="{{ disco }}" as="d" hint-placeholder-count="6">
+                <div style="width:94px;flex:0 0 auto;">
+                  <div style="width:94px;height:94px;position:relative;border-radius:11px;overflow:hidden;background:{{ d.cover }};box-shadow:inset 0 0 0 1px rgba(0,0,0,.07);"><div style="position:absolute;right:-14%;top:-14%;width:54%;height:54%;border-radius:50%;background:rgba(255,250,238,.15);"></div><div style="position:absolute;left:10%;bottom:12%;width:30%;height:30%;border-radius:50%;background:rgba(0,0,0,.15);"></div><sc-if value="{{ d.isFav }}"><span style="position:absolute;inset:0;border:3px solid #CC6B52;border-radius:11px;"></span><span style="position:absolute;left:6px;top:6px;font-size:12px;background:#CC6B52;color:#FBF6EA;border-radius:7px;padding:1px 6px;">&#9829;</span></sc-if></div>
+                  <div style="font-size:12px;color:#6A645A;margin-top:6px;line-height:1.15;">{{ d.al }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="margin-bottom:24px;">
+            <div style="font-family:'Instrument Serif',serif;font-size:25px;margin-bottom:3px;"><span style="color:#9A9183;">3.</span> Where should a newcomer <span style="background:#CFEADD;color:#1F5A40;padding:1px 9px;border-radius:8px;">start</span>?</div>
+            <div style="font-family:'Space Mono',monospace;font-size:12px;color:#9A9183;margin-bottom:11px;">this becomes the album you recommend to first-timers</div>
+            <div style="display:flex;gap:13px;overflow-x:auto;padding:2px 2px 12px;">
+              <sc-for list="{{ disco }}" as="d" hint-placeholder-count="6">
+                <div style="width:94px;flex:0 0 auto;">
+                  <div style="width:94px;height:94px;position:relative;border-radius:11px;overflow:hidden;background:{{ d.cover }};box-shadow:inset 0 0 0 1px rgba(0,0,0,.07);"><div style="position:absolute;right:-14%;top:-14%;width:54%;height:54%;border-radius:50%;background:rgba(255,250,238,.15);"></div><div style="position:absolute;left:10%;bottom:12%;width:30%;height:30%;border-radius:50%;background:rgba(0,0,0,.15);"></div><sc-if value="{{ d.isFirst }}"><span style="position:absolute;inset:0;border:3px solid #2E9E78;border-radius:11px;"></span><span style="position:absolute;left:6px;top:6px;font-size:12px;background:#2E9E78;color:#FBF6EA;border-radius:7px;padding:1px 6px;">&#9312;</span></sc-if></div>
+                  <div style="font-size:12px;color:#6A645A;margin-top:6px;line-height:1.15;">{{ d.al }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <button style="font-size:16px;font-weight:600;padding:12px 26px;background:#221F1B;color:#F1EADD;border:none;border-radius:12px;cursor:pointer;">Save my three &rarr;</button>
+        </div>
+      </sc-if>
+    </div>
+    </sc-if>
+
+    <!-- ============ PROFILE ============ -->
+    <sc-if value="{{ isProfile }}">
+    <div data-screen-label="Profile &middot; You">
+      <div style="display:flex;gap:18px;align-items:center;margin-bottom:24px;">
+        <div style="width:84px;height:84px;flex:0 0 auto;border-radius:50%;background:#E7D7B8;display:flex;align-items:center;justify-content:center;font-family:'Instrument Serif',serif;font-size:38px;color:#3A352E;">Y</div>
+        <div style="flex:1 1 auto;">
+          <div style="font-family:'Instrument Serif',serif;font-size:38px;line-height:.95;">@you.bsky.social</div>
+          <div style="font-size:14px;color:#6A645A;margin-top:5px;">12 artists set &middot; 36 tags given &middot; joined 2026</div>
+        </div>
+        <button style="font-size:15px;font-weight:600;padding:9px 18px;background:#FBF8F1;border:1px solid #DDD4C2;border-radius:11px;cursor:pointer;color:#221F1B;">Edit picks</button>
+      </div>
+
+      <div style="display:inline-flex;background:#E9E0D0;border:1px solid #E3DBCC;border-radius:12px;padding:3px;font-size:14px;margin-bottom:22px;">
+        <sc-if value="{{ isSets }}"><button onClick="{{ pSets }}" style="background:#FBF8F1;border:none;border-radius:9px;padding:7px 17px;font-weight:600;color:#221F1B;box-shadow:0 1px 2px rgba(34,31,27,.1);cursor:pointer;">By artist</button></sc-if>
+        <sc-if value="{{ isTag }}"><button onClick="{{ pSets }}" style="background:none;border:none;border-radius:9px;padding:7px 17px;color:#6A645A;cursor:pointer;">By artist</button></sc-if>
+        <sc-if value="{{ isTag }}"><button onClick="{{ pTag }}" style="background:#FBF8F1;border:none;border-radius:9px;padding:7px 17px;font-weight:600;color:#221F1B;box-shadow:0 1px 2px rgba(34,31,27,.1);cursor:pointer;">By tag</button></sc-if>
+        <sc-if value="{{ isSets }}"><button onClick="{{ pTag }}" style="background:none;border:none;border-radius:9px;padding:7px 17px;color:#6A645A;cursor:pointer;">By tag</button></sc-if>
+      </div>
+
+      <!-- SETS -->
+      <sc-if value="{{ isSets }}">
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:18px;">
+          <sc-for list="{{ sets }}" as="s" hint-placeholder-count="4">
+            <div style="border:1px solid #E7DFD0;border-radius:16px;background:#FBF8F1;padding:16px;box-shadow:0 1px 2px rgba(34,31,27,.04);">
+              <div style="display:flex;align-items:center;gap:11px;margin-bottom:13px;">
+                <div style="width:40px;height:40px;flex:0 0 auto;border-radius:50%;background:{{ s.av }};display:flex;align-items:center;justify-content:center;font-family:'Instrument Serif',serif;font-size:20px;color:#3A352E;">{{ s.ini }}</div>
+                <div style="font-family:'Instrument Serif',serif;font-size:24px;flex:1 1 auto;">{{ s.ar }}</div>
+                <span style="font-size:13px;color:#9A9183;cursor:pointer;text-decoration:underline;">view</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:11px;padding:8px 0;border-top:1px solid #EEE7D8;"><span style="width:84px;flex:0 0 auto;font-size:12px;font-weight:600;padding:3px 0;text-align:center;border-radius:8px;background:#F4E7C2;color:#6E4E12;">&#9733; Best</span><span style="font-size:16px;">{{ s.best }}</span></div>
+              <div style="display:flex;align-items:center;gap:11px;padding:8px 0;border-top:1px solid #EEE7D8;"><span style="width:84px;flex:0 0 auto;font-size:12px;font-weight:600;padding:3px 0;text-align:center;border-radius:8px;background:#F6D9CD;color:#7A3322;">&#9829; Favorite</span><span style="font-size:16px;">{{ s.fav }}</span></div>
+              <div style="display:flex;align-items:center;gap:11px;padding:8px 0;border-top:1px solid #EEE7D8;">
+                <span style="width:84px;flex:0 0 auto;font-size:12px;font-weight:600;padding:3px 0;text-align:center;border-radius:8px;background:#CFEADD;color:#1F5A40;">&#9312; First</span>
+                <sc-if value="{{ s.first }}"><span style="font-size:16px;">{{ s.first }}</span></sc-if>
+                <sc-if value="{{ s.noFirst }}"><span style="font-size:14px;color:#9A9183;border:1.5px dashed #C8BFAD;border-radius:8px;padding:3px 11px;cursor:pointer;">+ set a starter</span></sc-if>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <!-- BY TAG -->
+      <sc-if value="{{ isTag }}">
+        <div style="display:flex;flex-direction:column;gap:24px;">
+          <div>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:13px;"><span style="width:28px;height:28px;border-radius:9px;background:#C2902F;color:#FBF6EA;display:flex;align-items:center;justify-content:center;font-size:14px;">&#9733;</span><span style="font-family:'Instrument Serif',serif;font-size:25px;">Your Bests</span></div>
+            <div style="display:flex;gap:15px;overflow-x:auto;padding-bottom:8px;">
+              <sc-for list="{{ bests }}" as="b" hint-placeholder-count="3">
+                <div style="width:132px;flex:0 0 auto;"><div style="width:132px;height:132px;position:relative;border-radius:12px;overflow:hidden;background:{{ b.cover }};box-shadow:inset 0 0 0 1px rgba(0,0,0,.07);"><div style="position:absolute;right:-14%;top:-14%;width:52%;height:52%;border-radius:50%;background:rgba(255,250,238,.15);"></div><div style="position:absolute;left:11%;bottom:13%;width:28%;height:28%;border-radius:50%;background:rgba(0,0,0,.15);"></div></div><div style="font-size:15px;font-weight:600;margin-top:8px;line-height:1.1;">{{ b.al }}</div><div style="font-size:12px;color:#9A9183;">{{ b.ar }}</div></div>
+              </sc-for>
+            </div>
+          </div>
+          <div>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:13px;"><span style="width:28px;height:28px;border-radius:9px;background:#CC6B52;color:#FBF6EA;display:flex;align-items:center;justify-content:center;font-size:14px;">&#9829;</span><span style="font-family:'Instrument Serif',serif;font-size:25px;">Your Favorites</span></div>
+            <div style="display:flex;gap:15px;overflow-x:auto;padding-bottom:8px;">
+              <sc-for list="{{ favs }}" as="b" hint-placeholder-count="3">
+                <div style="width:132px;flex:0 0 auto;"><div style="width:132px;height:132px;position:relative;border-radius:12px;overflow:hidden;background:{{ b.cover }};box-shadow:inset 0 0 0 1px rgba(0,0,0,.07);"><div style="position:absolute;right:-14%;top:-14%;width:52%;height:52%;border-radius:50%;background:rgba(255,250,238,.15);"></div><div style="position:absolute;left:11%;bottom:13%;width:28%;height:28%;border-radius:50%;background:rgba(0,0,0,.15);"></div></div><div style="font-size:15px;font-weight:600;margin-top:8px;line-height:1.1;">{{ b.al }}</div><div style="font-size:12px;color:#9A9183;">{{ b.ar }}</div></div>
+              </sc-for>
+            </div>
+          </div>
+          <div>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:13px;"><span style="width:28px;height:28px;border-radius:9px;background:#2E9E78;color:#FBF6EA;display:flex;align-items:center;justify-content:center;font-size:14px;">&#9312;</span><span style="font-family:'Instrument Serif',serif;font-size:25px;">Your Firsts</span><span style="font-family:'Space Mono',monospace;font-size:11px;color:#9A9183;">what you'd hand a newcomer</span></div>
+            <div style="display:flex;gap:15px;overflow-x:auto;padding-bottom:8px;">
+              <sc-for list="{{ firsts }}" as="b" hint-placeholder-count="3">
+                <div style="width:132px;flex:0 0 auto;"><div style="width:132px;height:132px;position:relative;border-radius:12px;overflow:hidden;background:{{ b.cover }};box-shadow:inset 0 0 0 1px rgba(0,0,0,.07);"><div style="position:absolute;right:-14%;top:-14%;width:52%;height:52%;border-radius:50%;background:rgba(255,250,238,.15);"></div><div style="position:absolute;left:11%;bottom:13%;width:28%;height:28%;border-radius:50%;background:rgba(0,0,0,.15);"></div></div><div style="font-size:15px;font-weight:600;margin-top:8px;line-height:1.1;">{{ b.al }}</div><div style="font-size:12px;color:#9A9183;">{{ b.ar }}</div></div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+    </sc-if>
+
+  </div>
+  </sc-if>
+
+  <!-- ============ LOGIN ============ -->
+  <sc-if value="{{ isLogin }}">
+  <div data-screen-label="Login &middot; AT-proto" style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 24px;">
+    <div style="width:392px;max-width:100%;">
+      <div style="display:flex;align-items:center;gap:11px;margin-bottom:22px;">
+        <div style="display:flex;gap:3px;">
+          <span style="width:22px;height:22px;border-radius:6px;background:#C2902F;display:flex;align-items:center;justify-content:center;color:#FBF6EA;font-size:11px;">&#9733;</span>
+          <span style="width:22px;height:22px;border-radius:6px;background:#CC6B52;display:flex;align-items:center;justify-content:center;color:#FBF6EA;font-size:11px;">&#9829;</span>
+          <span style="width:22px;height:22px;border-radius:6px;background:#2E9E78;display:flex;align-items:center;justify-content:center;color:#FBF6EA;font-size:11px;">&#9312;</span>
+        </div>
+        <span style="font-family:'Instrument Serif',serif;font-size:30px;line-height:1;">BFF</span>
+      </div>
+      <div style="border:1px solid #E7DFD0;border-radius:20px;background:#FBF8F1;box-shadow:0 1px 2px rgba(34,31,27,.05),0 20px 50px rgba(34,31,27,.08);padding:30px 28px;">
+        <div style="font-family:'Instrument Serif',serif;font-size:30px;line-height:1.1;margin-bottom:5px;">Tag the albums<br>that matter.</div>
+        <div style="font-size:14px;color:#6A645A;margin-bottom:24px;">Sign in with your handle on any AT&nbsp;Protocol server.</div>
+        <div style="font-size:13px;font-weight:600;color:#3A352E;margin-bottom:7px;">Your handle</div>
+        <div style="display:flex;align-items:center;border:1.5px solid #2C2926;border-radius:11px;overflow:hidden;margin-bottom:16px;background:#fff;">
+          <span style="padding:11px 12px;background:#F1EADD;border-right:1.5px solid #DDD4C2;font-family:'Space Mono',monospace;font-size:15px;color:#6A645A;">@</span>
+          <span style="padding:11px 13px;font-size:16px;color:#9A9183;">you.bsky.social</span>
+        </div>
+        <button onClick="{{ goHome }}" style="width:100%;font-size:16px;font-weight:600;padding:13px;background:#221F1B;color:#F1EADD;border:none;border-radius:11px;cursor:pointer;margin-bottom:13px;">Continue &rarr;</button>
+        <div style="text-align:center;font-size:14px;color:#6A645A;cursor:pointer;text-decoration:underline;margin-bottom:18px;">Use a custom server (PDS)</div>
+        <div style="font-size:12px;color:#9A9183;line-height:1.6;border-top:1px solid #EEE7D8;padding-top:15px;">Bluesky or your own server &mdash; we redirect you there to sign in. We never see your password.</div>
+      </div>
+      <div onClick="{{ goHome }}" style="text-align:center;font-size:14px;color:#9A9183;cursor:pointer;margin-top:18px;">Browse without signing in &rsaquo;</div>
+    </div>
+  </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:1520},&quot;feedLayout&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;columns&quot;,&quot;grid&quot;,&quot;timeline&quot;],&quot;default&quot;:&quot;columns&quot;,&quot;tsType&quot;:&quot;'columns'|'grid'|'timeline'&quot;},&quot;artistTool&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;slots&quot;,&quot;toggles&quot;,&quot;guided&quot;],&quot;default&quot;:&quot;slots&quot;,&quot;tsType&quot;:&quot;'slots'|'toggles'|'guided'&quot;}}">
+class Component extends DCLogic {
+  state = { screen: 'home', homeTab: 'following', prof: 'sets' };
+
+  hash(s) { let h = 0; for (let i = 0; i < s.length; i++) { h = (h * 31 + s.charCodeAt(i)) >>> 0; } return h; }
+  cover(k) { const p = ['#33524F','#A8492B','#C28A30','#5A3A55','#2B5A3A','#27374C','#9A4327','#69703F','#8E5235','#46604B','#7A5230','#3F3A53']; return p[this.hash(k) % p.length]; }
+  avBg(k) { const p = ['#E7D7B8','#EBC9BA','#CDE5D6','#DED7C6','#E3C9CE','#CFE0DF','#E8D9C0']; return p[this.hash(k) % p.length]; }
+
+  renderVals() {
+    const st = this.state, p = this.props || {};
+    const feedLayout = p.feedLayout ?? 'columns';
+    const artistTool = p.artistTool ?? 'slots';
+
+    const META = {
+      best:  { label: 'Best',     glyph: '\u2605', bg: '#F4E7C2', fg: '#6E4E12', bd: '#E6D09A' },
+      fav:   { label: 'Favorite', glyph: '\u2665', bg: '#F6D9CD', fg: '#7A3322', bd: '#EBBBA9' },
+      first: { label: 'First',    glyph: '\u2460', bg: '#CFEADD', fg: '#1F5A40', bd: '#ABD8C1' },
+    };
+    const dress = (x) => {
+      const m = META[x.t];
+      return { ...x, cover: this.cover(x.al + x.ar), av: this.avBg(x.hh || x.i || x.al),
+        tLabel: m.label, tGlyph: m.glyph, tBg: m.bg, tFg: m.fg, tBd: m.bd,
+        isBest: x.t === 'best', isFav: x.t === 'fav', isFirst: x.t === 'first' };
+    };
+
+    const activity = [
+      { h: 'maya.bsky.social', hh: 'maya', i: 'M', al: 'In Rainbows', ar: 'Radiohead', t: 'best', tm: '2m', note: 'the warmth on this record is unreal.' },
+      { h: 'theo.bsky.social', hh: 'theo', i: 'T', al: 'Channel Orange', ar: 'Frank Ocean', t: 'fav', tm: '6m', note: 'i come back to side B every summer.' },
+      { h: 'juno.art', hh: 'juno', i: 'J', al: 'Discovery', ar: 'Daft Punk', t: 'first', tm: '11m', note: 'easiest doorway into their catalog.' },
+      { h: 'cleo.bsky.social', hh: 'cleo', i: 'C', al: 'To Pimp a Butterfly', ar: 'Kendrick Lamar', t: 'best', tm: '18m', note: 'a peak. nothing else sounds like it.' },
+      { h: 'ravi.fm', hh: 'ravi', i: 'R', al: 'Rumours', ar: 'Fleetwood Mac', t: 'fav', tm: '24m', note: 'every track earns its place.' },
+      { h: 'iris.bsky.social', hh: 'iris', i: 'I', al: 'Blue', ar: 'Joni Mitchell', t: 'first', tm: '31m', note: 'start here, then go anywhere.' },
+      { h: 'otis.bsky.social', hh: 'otis', i: 'O', al: 'OK Computer', ar: 'Radiohead', t: 'best', tm: '40m', note: 'the one that rewired me.' },
+      { h: 'mona.bsky.social', hh: 'mona', i: 'N', al: 'Blonde', ar: 'Frank Ocean', t: 'fav', tm: '52m', note: 'a quiet masterpiece.' },
+      { h: 'sol.fm', hh: 'sol', i: 'S', al: 'For Emma, Forever Ago', ar: 'Bon Iver', t: 'first', tm: '1h', note: 'where everyone should begin.' },
+    ].map(dress);
+    const byT = (t) => activity.filter((a) => a.t === t);
+
+    const people = [
+      { hh: 'maya', i: 'M' }, { hh: 'theo', i: 'T' }, { hh: 'juno', i: 'J' }, { hh: 'cleo', i: 'C' },
+      { hh: 'ravi', i: 'R' }, { hh: 'iris', i: 'I' }, { hh: 'otis', i: 'O' },
+    ].map((x) => ({ ...x, av: this.avBg(x.hh) }));
+    const genres = ['Rock', 'Indie', 'Hip-Hop', 'Electronic', 'Jazz', 'Soul', 'Pop', 'Ambient'];
+
+    const disco = [
+      { al: 'Pablo Honey', y: '1993', t: '' },
+      { al: 'The Bends', y: '1995', t: 'first' },
+      { al: 'OK Computer', y: '1997', t: 'best' },
+      { al: 'Kid A', y: '2000', t: '' },
+      { al: 'Amnesiac', y: '2001', t: '' },
+      { al: 'Hail to the Thief', y: '2003', t: '' },
+      { al: 'In Rainbows', y: '2007', t: 'fav' },
+      { al: 'The King of Limbs', y: '2011', t: '' },
+      { al: 'A Moon Shaped Pool', y: '2016', t: '' },
+    ].map((d) => {
+      const m = META[d.t];
+      return { ...d, cover: this.cover(d.al + 'Radiohead'),
+        isBest: d.t === 'best', isFav: d.t === 'fav', isFirst: d.t === 'first',
+        nBest: d.t !== 'best', nFav: d.t !== 'fav', nFirst: d.t !== 'first',
+        tLabel: m ? m.label : '', tGlyph: m ? m.glyph : '', tBg: m ? m.bg : '', tFg: m ? m.fg : '' };
+    });
+
+    const sets = [
+      { ar: 'Radiohead', best: 'OK Computer', fav: 'In Rainbows', first: 'The Bends' },
+      { ar: 'Frank Ocean', best: 'Blonde', fav: 'Channel Orange', first: 'Nostalgia, Ultra' },
+      { ar: 'Kendrick Lamar', best: 'To Pimp a Butterfly', fav: 'good kid, m.A.A.d city', first: 'Section.80' },
+      { ar: 'Daft Punk', best: 'Discovery', fav: 'Random Access Memories', first: '' },
+    ].map((s) => ({ ...s, av: this.avBg(s.ar), ini: s.ar.charAt(0), noFirst: !s.first }));
+
+    const go = (o) => () => this.setState(o);
+
+    return {
+      feedLayout, isCols: feedLayout === 'columns', isGrid: feedLayout === 'grid', isTimeline: feedLayout === 'timeline',
+      artistTool, isSlots: artistTool === 'slots', isToggles: artistTool === 'toggles', isGuided: artistTool === 'guided',
+      isHome: st.screen === 'home', isArtist: st.screen === 'artist', isLogin: st.screen === 'login', isProfile: st.screen === 'profile',
+      notLogin: st.screen !== 'login',
+      goHome: go({ screen: 'home' }), goArtist: go({ screen: 'artist' }), goLogin: go({ screen: 'login' }), goProfile: go({ screen: 'profile' }),
+      isFollowing: st.homeTab === 'following', isEveryone: st.homeTab === 'everyone',
+      tabFollowing: go({ homeTab: 'following' }), tabEveryone: go({ homeTab: 'everyone' }),
+      isSets: st.prof === 'sets', isTag: st.prof === 'tag', pSets: go({ prof: 'sets' }), pTag: go({ prof: 'tag' }),
+      activity, bests: byT('best'), favs: byT('fav'), firsts: byT('first'), people, genres, disco, sets,
+    };
+  }
+}
+</script>
+</body>
+</html>

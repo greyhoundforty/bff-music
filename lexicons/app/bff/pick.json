@@ -1,0 +1,70 @@
+{
+  "lexicon": 1,
+  "id": "app.bff.pick",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A single Best / Favorite / First pick for one artist, stored in the author's repo. Record key is deterministic: `${artistKey}.${kind}` so there is at most one pick per (artist, kind). Write with putRecord (create-or-overwrite).",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": ["kind", "artist", "album", "createdAt"],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "description": "Which slot this pick fills.",
+            "enum": ["best", "favorite", "first"]
+          },
+          "artist": {
+            "type": "ref",
+            "ref": "#artistRef"
+          },
+          "album": {
+            "type": "ref",
+            "ref": "#albumRef"
+          },
+          "note": {
+            "type": "string",
+            "description": "Optional one-line reason shown in the social feed.",
+            "maxGraphemes": 300,
+            "maxLength": 3000
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          }
+        }
+      }
+    },
+    "artistRef": {
+      "type": "object",
+      "description": "External reference to a music artist (artists are not atproto records).",
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string", "maxGraphemes": 200, "maxLength": 2000 },
+        "mbid": {
+          "type": "string",
+          "description": "MusicBrainz artist MBID (UUID), if known. Used to build the deterministic artistKey."
+        }
+      }
+    },
+    "albumRef": {
+      "type": "object",
+      "description": "External reference to an album / release group.",
+      "required": ["title"],
+      "properties": {
+        "title": { "type": "string", "maxGraphemes": 300, "maxLength": 3000 },
+        "mbid": {
+          "type": "string",
+          "description": "MusicBrainz release-group MBID (UUID), if known."
+        },
+        "year": { "type": "string", "maxLength": 8 },
+        "coverUrl": {
+          "type": "string",
+          "format": "uri",
+          "description": "Cover art URL (e.g. Cover Art Archive). For first wire-up we store a URL; a later version may upload a blob."
+        }
+      }
+    }
+  }
+}

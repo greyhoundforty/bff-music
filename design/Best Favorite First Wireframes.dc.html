@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Patrick+Hand&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;}
+  html,body{margin:0;}
+  body{background:#e7e1d3;}
+  ::selection{background:#ffe08a;}
+  ::-webkit-scrollbar{height:9px;width:9px;}
+  ::-webkit-scrollbar-thumb{background:#cfc8bb;border-radius:6px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+</style>
+</helmet>
+
+<div style="min-height:100vh;background:#f1ece1;background-image:repeating-linear-gradient(0deg, rgba(44,41,38,.035) 0 1px, transparent 1px 30px);font-family:'Patrick Hand',cursive;color:#2c2926;padding:30px 22px 90px;">
+
+  <div style="max-width:1180px;margin:0 auto 16px;display:flex;flex-wrap:wrap;align-items:flex-end;gap:14px 24px;">
+    <div>
+      <div style="font-family:'Caveat',cursive;font-weight:700;font-size:42px;line-height:.92;">Best &middot; Favorite &middot; First</div>
+      <div style="font-family:ui-monospace,Menlo,monospace;font-size:12px;color:#8a857c;margin-top:4px;">low-fi wireframes &middot; desktop web &middot; v1</div>
+    </div>
+    <div style="flex:1 1 auto;"></div>
+    <div style="display:flex;gap:14px;align-items:center;">
+      <span style="display:inline-flex;align-items:center;gap:7px;font-size:16px;"><span style="width:27px;height:27px;border:1.5px solid #2c2926;border-radius:50%;background:#ffe08a;display:flex;align-items:center;justify-content:center;font-size:13px;">&#9733;</span> Best <span style="font-family:ui-monospace,monospace;font-size:11px;color:#8a857c;">artist's peak</span></span>
+      <span style="display:inline-flex;align-items:center;gap:7px;font-size:16px;"><span style="width:27px;height:27px;border:1.5px solid #2c2926;border-radius:50%;background:#ffb1a3;display:flex;align-items:center;justify-content:center;font-size:13px;">&#9829;</span> Favorite <span style="font-family:ui-monospace,monospace;font-size:11px;color:#8a857c;">yours</span></span>
+      <span style="display:inline-flex;align-items:center;gap:7px;font-size:16px;"><span style="width:27px;height:27px;border:1.5px solid #2c2926;border-radius:50%;background:#9ee0c6;display:flex;align-items:center;justify-content:center;font-size:13px;">&#9312;</span> First <span style="font-family:ui-monospace,monospace;font-size:11px;color:#8a857c;">start here</span></span>
+    </div>
+  </div>
+
+  <div style="max-width:1180px;margin:0 auto 14px;display:flex;flex-wrap:wrap;gap:9px;align-items:center;">
+    <span style="font-family:'Caveat',cursive;font-size:22px;color:#6f6a60;margin-right:2px;">screens:</span>
+    <button onClick="{{ goHome }}" style="font-family:'Patrick Hand',cursive;font-size:18px;padding:7px 15px 9px;background:#fbfaf6;border:2px solid #2c2926;border-radius:11px 8px 12px 9px/9px 12px 8px 11px;cursor:pointer;color:#2c2926;position:relative;" style-hover="background:#fff;">Home feed<sc-if value="{{ isHome }}"><span style="position:absolute;left:8px;right:8px;bottom:-8px;height:5px;background:#2c2926;border-radius:5px;"></span></sc-if></button>
+    <button onClick="{{ goArtist }}" style="font-family:'Patrick Hand',cursive;font-size:18px;padding:7px 15px 9px;background:#fbfaf6;border:2px solid #2c2926;border-radius:9px 12px 8px 11px/11px 8px 12px 9px;cursor:pointer;color:#2c2926;position:relative;" style-hover="background:#fff;">Artist page<sc-if value="{{ isArtist }}"><span style="position:absolute;left:8px;right:8px;bottom:-8px;height:5px;background:#2c2926;border-radius:5px;"></span></sc-if></button>
+    <button onClick="{{ goLogin }}" style="font-family:'Patrick Hand',cursive;font-size:18px;padding:7px 15px 9px;background:#fbfaf6;border:2px solid #2c2926;border-radius:11px 9px 12px 8px/8px 12px 9px 11px;cursor:pointer;color:#2c2926;position:relative;" style-hover="background:#fff;">Login<sc-if value="{{ isLogin }}"><span style="position:absolute;left:8px;right:8px;bottom:-8px;height:5px;background:#2c2926;border-radius:5px;"></span></sc-if></button>
+    <button onClick="{{ goProfile }}" style="font-family:'Patrick Hand',cursive;font-size:18px;padding:7px 15px 9px;background:#fbfaf6;border:2px solid #2c2926;border-radius:9px 11px 10px 12px/12px 10px 11px 9px;cursor:pointer;color:#2c2926;position:relative;" style-hover="background:#fff;">Profile<sc-if value="{{ isProfile }}"><span style="position:absolute;left:8px;right:8px;bottom:-8px;height:5px;background:#2c2926;border-radius:5px;"></span></sc-if></button>
+  </div>
+
+  <div style="max-width:1180px;margin:0 auto 16px;display:flex;flex-wrap:wrap;gap:9px;align-items:center;min-height:40px;">
+    <span style="font-family:'Caveat',cursive;font-size:21px;color:#9a9286;">exploring &rarr;</span>
+    <sc-if value="{{ isHome }}">
+      <button onClick="{{ dirA }}" style="font-family:'Patrick Hand',cursive;font-size:16px;padding:5px 12px 7px;background:#fbfaf6;border:2px solid #2c2926;border-radius:10px 7px 11px 8px;cursor:pointer;color:#2c2926;position:relative;" style-hover="background:#fff;">A &middot; Activity grid<sc-if value="{{ isDirA }}"><span style="position:absolute;left:7px;right:7px;bottom:-7px;height:4px;background:#2c2926;border-radius:4px;"></span></sc-if></button>
+      <button onClick="{{ dirB }}" style="font-family:'Patrick Hand',cursive;font-size:16px;padding:5px 12px 7px;background:#fbfaf6;border:2px solid #2c2926;border-radius:8px 11px 7px 10px;cursor:pointer;color:#2c2926;position:relative;" style-hover="background:#fff;">B &middot; Three columns<sc-if value="{{ isDirB }}"><span style="position:absolute;left:7px;right:7px;bottom:-7px;height:4px;background:#2c2926;border-radius:4px;"></span></sc-if></button>
+      <button onClick="{{ dirC }}" style="font-family:'Patrick Hand',cursive;font-size:16px;padding:5px 12px 7px;background:#fbfaf6;border:2px solid #2c2926;border-radius:11px 8px 10px 9px;cursor:pointer;color:#2c2926;position:relative;" style-hover="background:#fff;">C &middot; Social timeline<sc-if value="{{ isDirC }}"><span style="position:absolute;left:7px;right:7px;bottom:-7px;height:4px;background:#2c2926;border-radius:4px;"></span></sc-if></button>
+    </sc-if>
+    <sc-if value="{{ isArtist }}">
+      <button onClick="{{ mSlots }}" style="font-family:'Patrick Hand',cursive;font-size:16px;padding:5px 12px 7px;background:#fbfaf6;border:2px solid #2c2926;border-radius:10px 7px 11px 8px;cursor:pointer;color:#2c2926;position:relative;" style-hover="background:#fff;">1 &middot; Slots<sc-if value="{{ isSlots }}"><span style="position:absolute;left:7px;right:7px;bottom:-7px;height:4px;background:#2c2926;border-radius:4px;"></span></sc-if></button>
+      <button onClick="{{ mToggles }}" style="font-family:'Patrick Hand',cursive;font-size:16px;padding:5px 12px 7px;background:#fbfaf6;border:2px solid #2c2926;border-radius:8px 11px 7px 10px;cursor:pointer;color:#2c2926;position:relative;" style-hover="background:#fff;">2 &middot; Inline toggles<sc-if value="{{ isToggles }}"><span style="position:absolute;left:7px;right:7px;bottom:-7px;height:4px;background:#2c2926;border-radius:4px;"></span></sc-if></button>
+      <button onClick="{{ mGuided }}" style="font-family:'Patrick Hand',cursive;font-size:16px;padding:5px 12px 7px;background:#fbfaf6;border:2px solid #2c2926;border-radius:11px 8px 10px 9px;cursor:pointer;color:#2c2926;position:relative;" style-hover="background:#fff;">3 &middot; Guided<sc-if value="{{ isGuided }}"><span style="position:absolute;left:7px;right:7px;bottom:-7px;height:4px;background:#2c2926;border-radius:4px;"></span></sc-if></button>
+    </sc-if>
+    <sc-if value="{{ isProfile }}">
+      <button onClick="{{ pSets }}" style="font-family:'Patrick Hand',cursive;font-size:16px;padding:5px 12px 7px;background:#fbfaf6;border:2px solid #2c2926;border-radius:10px 7px 11px 8px;cursor:pointer;color:#2c2926;position:relative;" style-hover="background:#fff;">By artist<sc-if value="{{ isSets }}"><span style="position:absolute;left:7px;right:7px;bottom:-7px;height:4px;background:#2c2926;border-radius:4px;"></span></sc-if></button>
+      <button onClick="{{ pTag }}" style="font-family:'Patrick Hand',cursive;font-size:16px;padding:5px 12px 7px;background:#fbfaf6;border:2px solid #2c2926;border-radius:8px 11px 7px 10px;cursor:pointer;color:#2c2926;position:relative;" style-hover="background:#fff;">By tag<sc-if value="{{ isTag }}"><span style="position:absolute;left:7px;right:7px;bottom:-7px;height:4px;background:#2c2926;border-radius:4px;"></span></sc-if></button>
+    </sc-if>
+    <sc-if value="{{ isLogin }}"><span style="font-family:'Caveat',cursive;font-size:20px;color:#9a9286;">two auth concepts, side by side &darr;</span></sc-if>
+  </div>
+
+  <div style="max-width:1180px;margin:0 auto;border:2.5px solid #2c2926;border-radius:16px 12px 16px 12px/12px 16px 12px 16px;background:#fbfaf6;box-shadow:7px 8px 0 rgba(44,41,38,.13);overflow:hidden;">
+    <div style="display:flex;align-items:center;gap:7px;padding:9px 14px;border-bottom:2px solid #2c2926;background:#ece7dc;">
+      <span style="width:11px;height:11px;border-radius:50%;border:1.5px solid #2c2926;"></span>
+      <span style="width:11px;height:11px;border-radius:50%;border:1.5px solid #2c2926;"></span>
+      <span style="width:11px;height:11px;border-radius:50%;border:1.5px solid #2c2926;"></span>
+      <div style="margin-left:10px;background:#fbfaf6;border:1.5px solid #2c2926;border-radius:7px;padding:3px 13px;font-family:ui-monospace,Menlo,monospace;font-size:12px;color:#6f6a60;">bff.app{{ urlPath }}</div>
+    </div>
+
+    <div style="padding:20px 20px 26px;min-height:560px;">
+
+      <sc-if value="{{ notLogin }}">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px;">
+        <div style="display:flex;align-items:center;gap:9px;">
+          <div style="display:flex;border:2px solid #2c2926;border-radius:9px 6px 9px 6px;overflow:hidden;">
+            <span style="width:23px;height:27px;display:flex;align-items:center;justify-content:center;background:#ffe08a;border-right:1.5px solid #2c2926;font-size:13px;">&#9733;</span>
+            <span style="width:23px;height:27px;display:flex;align-items:center;justify-content:center;background:#ffb1a3;border-right:1.5px solid #2c2926;font-size:13px;">&#9829;</span>
+            <span style="width:23px;height:27px;display:flex;align-items:center;justify-content:center;background:#9ee0c6;font-size:13px;">&#9312;</span>
+          </div>
+          <span style="font-family:'Caveat',cursive;font-weight:700;font-size:25px;">BFF</span>
+        </div>
+        <nav style="display:flex;gap:16px;font-size:17px;color:#9a9286;margin-left:6px;">
+          <span style="color:#2c2926;border-bottom:2px solid #2c2926;padding-bottom:2px;">Discover</span>
+          <span>Artists</span>
+          <span>You</span>
+        </nav>
+        <div style="flex:1 1 auto;"></div>
+        <div style="display:flex;align-items:center;gap:8px;border:2px solid #2c2926;border-radius:9px 7px 9px 7px;padding:6px 12px;background:#fff;min-width:230px;color:#9a9286;font-size:15px;"><span>&#9906;</span><span>search artists, albums, people</span></div>
+        <div style="width:38px;height:38px;border-radius:50%;border:2px solid #2c2926;background-color:#efece4;background-image:repeating-linear-gradient(45deg, rgba(44,41,38,.1) 0 5px, transparent 5px 10px);display:flex;align-items:center;justify-content:center;font-family:'Caveat',cursive;font-size:18px;">Y</div>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ isHome }}">
+
+        <sc-if value="{{ isDirA }}">
+        <div data-screen-label="Home A &middot; Activity grid">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;"><span style="font-family:'Caveat',cursive;font-size:21px;color:#6f6a60;">recently tagged</span></div>
+          <div style="display:flex;gap:13px;overflow:hidden;padding-bottom:8px;margin-bottom:16px;border-bottom:1.5px dashed #cfc8bb;">
+            <sc-for list="{{ people }}" as="pp" hint-placeholder-count="7">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:5px;width:64px;flex:0 0 auto;">
+                <div style="width:54px;height:54px;border-radius:50%;border:2px solid #2c2926;background-color:#efece4;background-image:repeating-linear-gradient(45deg, rgba(44,41,38,.09) 0 6px, transparent 6px 12px);display:flex;align-items:center;justify-content:center;font-family:'Caveat',cursive;font-size:23px;">{{ pp.i }}</div>
+                <span style="font-size:12px;color:#6f6a60;max-width:62px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">@{{ pp.h }}</span>
+              </div>
+            </sc-for>
+            <div style="display:flex;align-items:center;font-size:24px;color:#9a9286;padding:0 4px;">&rsaquo;</div>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;">
+            <span style="font-size:14px;padding:4px 11px;border:1.5px solid #2c2926;border-radius:10px 7px 11px 8px;background:#fbfaf6;">All</span>
+            <span style="font-size:14px;padding:4px 11px;border:1.5px solid #2c2926;border-radius:9px 11px 8px 10px;background:#ffe08a;">Following</span>
+            <sc-for list="{{ genres }}" as="g" hint-placeholder-count="8"><span style="font-size:14px;padding:4px 11px;border:1.5px solid #2c2926;border-radius:10px 8px 11px 7px;background:#fbfaf6;color:#6f6a60;">{{ g }}</span></sc-for>
+          </div>
+          <sc-if value="{{ followingFirst }}"><div style="font-family:'Caveat',cursive;font-size:23px;margin-bottom:11px;">From people you follow <span style="font-size:14px;color:#9a9286;font-family:'Patrick Hand',cursive;">&middot; back-filled with recent tags when it's quiet</span></div></sc-if>
+          <sc-if value="{{ notFollowingFirst }}"><div style="font-family:'Caveat',cursive;font-size:23px;margin-bottom:11px;">Recently tagged across BFF</div></sc-if>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+            <sc-for list="{{ activity }}" as="a" hint-placeholder-count="6">
+              <div style="border:2px solid #2c2926;border-radius:13px 9px 13px 9px/9px 13px 9px 13px;background:#fff;padding:10px;display:flex;flex-direction:column;gap:6px;">
+                <div style="aspect-ratio:1/1;border:1.5px solid #2c2926;border-radius:9px 7px 10px 6px;background-color:#efece4;background-image:repeating-linear-gradient(45deg, rgba(44,41,38,.07) 0 7px, transparent 7px 14px);position:relative;">
+                  <span style="position:absolute;left:7px;bottom:7px;font-family:ui-monospace,Menlo,monospace;font-size:10px;color:#8a857c;background:#f1ece1;padding:1px 5px;border-radius:3px;">cover</span>
+                  <span style="position:absolute;right:8px;top:6px;font-size:16px;color:#6f6a60;">&#9825;</span>
+                </div>
+                <div style="font-size:18px;line-height:1.05;">{{ a.al }}</div>
+                <div style="font-size:14px;color:#6f6a60;margin-top:-4px;">{{ a.ar }}</div>
+                <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:2px;">
+                  <sc-if value="{{ a.isBest }}"><span style="font-size:12px;padding:1px 7px;border:1.5px solid #2c2926;border-radius:7px 5px 8px 5px;background:#ffe08a;white-space:nowrap;">&#9733; Best</span></sc-if>
+                  <sc-if value="{{ a.isFav }}"><span style="font-size:12px;padding:1px 7px;border:1.5px solid #2c2926;border-radius:7px 5px 8px 5px;background:#ffb1a3;white-space:nowrap;">&#9829; Favorite</span></sc-if>
+                  <sc-if value="{{ a.isFirst }}"><span style="font-size:12px;padding:1px 7px;border:1.5px solid #2c2926;border-radius:7px 5px 8px 5px;background:#9ee0c6;white-space:nowrap;">&#9312; First</span></sc-if>
+                  <span style="font-size:11px;color:#9a9286;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">@{{ a.h }} &middot; {{ a.tm }}</span>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        </sc-if>
+
+        <sc-if value="{{ isDirB }}">
+        <div data-screen-label="Home B &middot; Three columns">
+          <div style="display:flex;align-items:center;gap:9px;margin-bottom:15px;flex-wrap:wrap;">
+            <span style="font-size:14px;padding:4px 11px;border:1.5px solid #2c2926;border-radius:9px 11px 8px 10px;background:#ffe08a;">Following</span>
+            <span style="font-size:14px;padding:4px 11px;border:1.5px solid #2c2926;border-radius:10px 7px 11px 8px;background:#fbfaf6;color:#6f6a60;">Everyone</span>
+            <span style="font-family:'Caveat',cursive;font-size:20px;color:#9a9286;margin-left:auto;">what people are naming, right now &rarr;</span>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:start;">
+            <div style="display:flex;flex-direction:column;gap:11px;">
+              <div style="display:flex;align-items:center;gap:8px;font-family:'Caveat',cursive;font-weight:700;font-size:25px;border:2px solid #2c2926;border-radius:11px 8px 11px 8px;background:#ffe08a;padding:6px 12px;"><span style="width:26px;height:26px;border:1.5px solid #2c2926;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;">&#9733;</span> BEST</div>
+              <sc-for list="{{ bests }}" as="b" hint-placeholder-count="3">
+                <div style="border:2px solid #2c2926;border-radius:11px 8px 11px 8px;background:#fff;padding:9px;display:flex;gap:9px;align-items:center;">
+                  <div style="width:52px;height:52px;flex:0 0 auto;border:1.5px solid #2c2926;border-radius:7px;background-color:#efece4;background-image:repeating-linear-gradient(45deg, rgba(44,41,38,.08) 0 6px, transparent 6px 12px);"></div>
+                  <div style="min-width:0;"><div style="font-size:16px;line-height:1.05;">{{ b.al }}</div><div style="font-size:13px;color:#6f6a60;">{{ b.ar }}</div><div style="font-size:11px;color:#9a9286;margin-top:2px;">@{{ b.h }} &middot; {{ b.tm }}</div></div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:11px;">
+              <div style="display:flex;align-items:center;gap:8px;font-family:'Caveat',cursive;font-weight:700;font-size:25px;border:2px solid #2c2926;border-radius:8px 11px 8px 11px;background:#ffb1a3;padding:6px 12px;"><span style="width:26px;height:26px;border:1.5px solid #2c2926;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;">&#9829;</span> FAVORITE</div>
+              <sc-for list="{{ favs }}" as="b" hint-placeholder-count="3">
+                <div style="border:2px solid #2c2926;border-radius:8px 11px 8px 11px;background:#fff;padding:9px;display:flex;gap:9px;align-items:center;">
+                  <div style="width:52px;height:52px;flex:0 0 auto;border:1.5px solid #2c2926;border-radius:7px;background-color:#efece4;background-image:repeating-linear-gradient(45deg, rgba(44,41,38,.08) 0 6px, transparent 6px 12px);"></div>
+                  <div style="min-width:0;"><div style="font-size:16px;line-height:1.05;">{{ b.al }}</div><div style="font-size:13px;color:#6f6a60;">{{ b.ar }}</div><div style="font-size:11px;color:#9a9286;margin-top:2px;">@{{ b.h }} &middot; {{ b.tm }}</div></div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:11px;">
+              <div style="display:flex;align-items:center;gap:8px;font-family:'Caveat',cursive;font-weight:700;font-size:25px;border:2px solid #2c2926;border-radius:11px 8px 11px 8px;background:#9ee0c6;padding:6px 12px;"><span style="width:26px;height:26px;border:1.5px solid #2c2926;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;">&#9312;</span> FIRST</div>
+              <sc-for list="{{ firsts }}" as="b" hint-placeholder-count="3">
+                <div style="border:2px solid #2c2926;border-radius:11px 8px 11px 8px;background:#fff;padding:9px;display:flex;gap:9px;align-items:center;">
+                  <div style="width:52px;height:52px;flex:0 0 auto;border:1.5px solid #2c2926;border-radius:7px;background-color:#efece4;background-image:repeating-linear-gradient(45deg, rgba(44,41,38,.08) 0 6px, transparent 6px 12px);"></div>
+                  <div style="min-width:0;"><div style="font-size:16px;line-height:1.05;">{{ b.al }}</div><div style="font-size:13px;color:#6f6a60;">{{ b.ar }}</div><div style="font-size:11px;color:#9a9286;margin-top:2px;">@{{ b.h }} &middot; {{ b.tm }}</div></div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+        </sc-if>
+
+        <sc-if value="{{ isDirC }}">
+        <div data-screen-label="Home C &middot; Social timeline" style="display:flex;gap:22px;align-items:flex-start;">
+          <div style="flex:1 1 auto;display:flex;flex-direction:column;gap:14px;min-width:0;">
+            <div style="font-family:'Caveat',cursive;font-size:23px;">Your following feed</div>
+            <sc-for list="{{ activity }}" as="a" hint-placeholder-count="5">
+              <div style="border:2px solid #2c2926;border-radius:13px 9px 13px 9px;background:#fff;padding:13px;display:flex;gap:12px;">
+                <div style="width:44px;height:44px;flex:0 0 auto;border-radius:50%;border:2px solid #2c2926;background-color:#efece4;background-image:repeating-linear-gradient(45deg, rgba(44,41,38,.09) 0 6px, transparent 6px 12px);display:flex;align-items:center;justify-content:center;font-family:'Caveat',cursive;font-size:20px;">{{ a.i }}</div>
+                <div style="flex:1 1 auto;min-width:0;">
+                  <div style="font-size:17px;line-height:1.35;"><strong>@{{ a.h }}</strong> named <strong>{{ a.al }}</strong> their <sc-if value="{{ a.isBest }}"><span style="font-size:13px;padding:1px 7px;border:1.5px solid #2c2926;border-radius:7px 5px 8px 5px;background:#ffe08a;white-space:nowrap;">&#9733; Best</span></sc-if><sc-if value="{{ a.isFav }}"><span style="font-size:13px;padding:1px 7px;border:1.5px solid #2c2926;border-radius:7px 5px 8px 5px;background:#ffb1a3;white-space:nowrap;">&#9829; Favorite</span></sc-if><sc-if value="{{ a.isFirst }}"><span style="font-size:13px;padding:1px 7px;border:1.5px solid #2c2926;border-radius:7px 5px 8px 5px;background:#9ee0c6;white-space:nowrap;">&#9312; First</span></sc-if> for {{ a.ar }}</div>
+                  <sc-if value="{{ a.note }}"><div style="font-family:'Caveat',cursive;font-size:19px;color:#4a4640;margin-top:7px;border-left:3px solid #cfc8bb;padding-left:10px;">&ldquo;{{ a.note }}&rdquo;</div></sc-if>
+                  <div style="display:flex;gap:16px;align-items:center;margin-top:9px;font-size:13px;color:#9a9286;"><span>&#9825; 12</span><span>&#8617; reply</span><span>{{ a.tm }} ago</span></div>
+                </div>
+                <div style="width:88px;height:88px;flex:0 0 auto;border:1.5px solid #2c2926;border-radius:9px 7px 10px 6px;background-color:#efece4;background-image:repeating-linear-gradient(45deg, rgba(44,41,38,.07) 0 7px, transparent 7px 14px);position:relative;"><span style="position:absolute;left:5px;bottom:5px;font-family:ui-monospace,monospace;font-size:9px;color:#8a857c;background:#f1ece1;padding:1px 4px;border-radius:3px;">cover</span></div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="flex:0 0 230px;display:flex;flex-direction:column;gap:14px;">
+            <div style="border:2px solid #2c2926;border-radius:13px 9px 12px 10px;background:#fff;padding:13px;">
+              <div style="font-family:'Caveat',cursive;font-size:20px;margin-bottom:9px;">People you follow</div>
+              <sc-for list="{{ people }}" as="pp" hint-placeholder-count="6">
+                <div style="display:flex;align-items:center;gap:9px;padding:5px 0;border-top:1px dashed #e2dccf;">
+                  <div style="width:30px;height:30px;border-radius:50%;border:1.5px solid #2c2926;background-color:#efece4;background-image:repeating-linear-gradient(45deg, rgba(44,41,38,.09) 0 5px, transparent 5px 10px);display:flex;align-items:center;justify-content:center;font-family:'Caveat',cursive;font-size:15px;">{{ pp.i }}</div>
+                  <span style="font-size:14px;color:#4a4640;">@{{ pp.h }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <div style="border:2px solid #2c2926;border-radius:10px 13px 9px 12px;background:#fff;padding:13px;">
+              <div style="font-family:'Caveat',cursive;font-size:20px;margin-bottom:7px;">Discover artists</div>
+              <div style="font-size:13px;color:#9a9286;line-height:1.7;">Radiohead<br>Frank Ocean<br>Fleetwood Mac<br>+ find more &rsaquo;</div>
+            </div>
+          </div>
+        </div>
+        </sc-if>
+
+      </sc-if>
+
+      <sc-if value="{{ isArtist }}">
+        <div data-screen-label="Artist page">
+        <div style="display:flex;gap:16px;align-items:flex-end;margin-bottom:18px;">
+          <div style="width:104px;height:104px;flex:0 0 auto;border:2px solid #2c2926;border-radius:13px 9px 13px 9px;background-color:#efece4;background-image:repeating-linear-gradient(45deg, rgba(44,41,38,.08) 0 8px, transparent 8px 16px);position:relative;"><span style="position:absolute;left:6px;bottom:6px;font-family:ui-monospace,monospace;font-size:10px;color:#8a857c;background:#f1ece1;padding:1px 5px;border-radius:3px;">artist photo</span></div>
+          <div>
+            <div style="font-family:ui-monospace,monospace;font-size:12px;color:#9a9286;letter-spacing:1px;">ARTIST</div>
+            <div style="font-family:'Caveat',cursive;font-weight:700;font-size:46px;line-height:.9;">Radiohead</div>
+            <div style="font-size:15px;color:#6f6a60;margin-top:6px;">9 albums &middot; 4,210 taggers &middot; <strong style="color:#2c2926;">you've set 2 of 3</strong></div>
+          </div>
+        </div>
+
+        <sc-if value="{{ isSlots }}">
+          <div style="font-family:'Caveat',cursive;font-size:22px;margin-bottom:11px;">Set your three &mdash; drag an album into each slot</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px;">
+            <div style="border:2px solid #2c2926;border-radius:13px 9px 13px 9px;padding:12px;background:#fff;">
+              <div style="display:flex;align-items:center;gap:7px;font-family:'Caveat',cursive;font-weight:700;font-size:21px;margin-bottom:10px;"><span style="width:24px;height:24px;border:1.5px solid #2c2926;border-radius:50%;background:#ffe08a;display:flex;align-items:center;justify-content:center;font-size:12px;">&#9733;</span> BEST</div>
+              <div style="display:flex;gap:10px;align-items:center;">
+                <div style="width:60px;height:60px;flex:0 0 auto;border:1.5px solid #2c2926;border-radius:8px;background-color:#efece4;background-image:repeating-linear-gradient(45deg, rgba(44,41,38,.08) 0 6px, transparent 6px 12px);"></div>
+                <div style="min-width:0;"><div style="font-size:17px;">OK Computer</div><div style="font-size:13px;color:#6f6a60;">1997</div><div style="font-size:12px;color:#9a9286;text-decoration:underline wavy;cursor:pointer;margin-top:3px;">replace</div></div>
+              </div>
+            </div>
+            <div style="border:2px solid #2c2926;border-radius:9px 13px 9px 13px;padding:12px;background:#fff;">
+              <div style="display:flex;align-items:center;gap:7px;font-family:'Caveat',cursive;font-weight:700;font-size:21px;margin-bottom:10px;"><span style="width:24px;height:24px;border:1.5px solid #2c2926;border-radius:50%;background:#ffb1a3;display:flex;align-items:center;justify-content:center;font-size:12px;">&#9829;</span> FAVORITE</div>
+              <div style="border:2px dashed #b9b2a4;border-radius:9px;padding:16px 10px;text-align:center;color:#9a9286;"><div style="font-size:30px;line-height:1;color:#cfc8bb;">&#8595;</div><div style="font-family:'Caveat',cursive;font-size:19px;margin-top:4px;">drag an album here</div><div style="font-size:12px;font-family:ui-monospace,monospace;">or pick from below</div></div>
+            </div>
+            <div style="border:2px solid #2c2926;border-radius:13px 9px 13px 9px;padding:12px;background:#fff;">
+              <div style="display:flex;align-items:center;gap:7px;font-family:'Caveat',cursive;font-weight:700;font-size:21px;margin-bottom:10px;"><span style="width:24px;height:24px;border:1.5px solid #2c2926;border-radius:50%;background:#9ee0c6;display:flex;align-items:center;justify-content:center;font-size:12px;">&#9312;</span> FIRST</div>
+              <div style="display:flex;gap:10px;align-items:center;">
+                <div style="width:60px;height:60px;flex:0 0 auto;border:1.5px solid #2c2926;border-radius:8px;background-color:#efece4;background-image:repeating-linear-gradient(45deg, rgba(44,41,38,.08) 0 6px, transparent 6px 12px);"></div>
+                <div style="min-width:0;"><div style="font-size:17px;">The Bends</div><div style="font-size:13px;color:#6f6a60;">1995</div><div style="font-size:11px;color:#9a9286;margin-top:3px;font-family:ui-monospace,monospace;">newcomers see this first</div></div>
+              </div>
+            </div>
+          </div>
+          <div style="font-family:'Caveat',cursive;font-size:20px;color:#6f6a60;margin-bottom:11px;">Discography <span style="font-size:13px;font-family:ui-monospace,monospace;">&middot; drag a card up, or use &middot;&middot;&middot;</span></div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;">
+            <sc-for list="{{ disco }}" as="d" hint-placeholder-count="9">
+              <div style="border:2px solid #2c2926;border-radius:11px 8px 11px 8px;background:#fff;padding:9px;display:flex;gap:10px;align-items:center;">
+                <div style="font-size:16px;color:#cfc8bb;cursor:grab;">&#8942;&#8942;</div>
+                <div style="width:46px;height:46px;flex:0 0 auto;border:1.5px solid #2c2926;border-radius:6px;background-color:#efece4;background-image:repeating-linear-gradient(45deg, rgba(44,41,38,.08) 0 5px, transparent 5px 10px);"></div>
+                <div style="flex:1 1 auto;min-width:0;"><div style="font-size:15px;line-height:1.05;">{{ d.al }}</div><div style="font-size:12px;color:#9a9286;">{{ d.y }}</div></div>
+                <div style="font-size:18px;color:#9a9286;">&middot;&middot;&middot;</div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isToggles }}">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;border:2px solid #2c2926;border-radius:11px;background:#f7f3ea;padding:9px 13px;margin-bottom:6px;">
+            <span style="font-family:'Caveat',cursive;font-size:20px;">your picks:</span>
+            <span style="font-size:13px;padding:1px 8px;border:1.5px solid #2c2926;border-radius:7px;background:#ffe08a;">&#9733; OK Computer</span>
+            <span style="font-size:13px;padding:1px 8px;border:1.5px solid #2c2926;border-radius:7px;background:#ffb1a3;">&#9829; In Rainbows</span>
+            <span style="font-size:13px;padding:1px 8px;border:1.5px solid #2c2926;border-radius:7px;background:#9ee0c6;">&#9312; The Bends</span>
+          </div>
+          <div style="font-family:'Caveat',cursive;font-size:20px;color:#6f6a60;margin:12px 0 11px;">Tap a tag on any album &mdash; each tag sticks to just one</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;">
+            <sc-for list="{{ disco }}" as="d" hint-placeholder-count="9">
+              <div style="border:2px solid #2c2926;border-radius:11px 8px 11px 8px;background:#fff;padding:10px;display:flex;flex-direction:column;gap:8px;">
+                <div style="display:flex;gap:10px;align-items:center;">
+                  <div style="width:48px;height:48px;flex:0 0 auto;border:1.5px solid #2c2926;border-radius:6px;background-color:#efece4;background-image:repeating-linear-gradient(45deg, rgba(44,41,38,.08) 0 5px, transparent 5px 10px);"></div>
+                  <div style="min-width:0;"><div style="font-size:15px;line-height:1.05;">{{ d.al }}</div><div style="font-size:12px;color:#9a9286;">{{ d.y }}</div></div>
+                </div>
+                <div style="display:flex;gap:6px;">
+                  <sc-if value="{{ d.isBest }}"><span style="flex:1;text-align:center;font-size:12px;padding:3px 0;border:1.5px solid #2c2926;border-radius:7px;background:#ffe08a;">&#9733; Best</span></sc-if>
+                  <sc-if value="{{ d.nBest }}"><span style="flex:1;text-align:center;font-size:12px;padding:3px 0;border:1.5px solid #cfc8bb;border-radius:7px;background:#fbfaf6;color:#9a9286;cursor:pointer;">&#9733; Best</span></sc-if>
+                  <sc-if value="{{ d.isFav }}"><span style="flex:1;text-align:center;font-size:12px;padding:3px 0;border:1.5px solid #2c2926;border-radius:7px;background:#ffb1a3;">&#9829; Fav</span></sc-if>
+                  <sc-if value="{{ d.nFav }}"><span style="flex:1;text-align:center;font-size:12px;padding:3px 0;border:1.5px solid #cfc8bb;border-radius:7px;background:#fbfaf6;color:#9a9286;cursor:pointer;">&#9829; Fav</span></sc-if>
+                  <sc-if value="{{ d.isFirst }}"><span style="flex:1;text-align:center;font-size:12px;padding:3px 0;border:1.5px solid #2c2926;border-radius:7px;background:#9ee0c6;">&#9312; First</span></sc-if>
+                  <sc-if value="{{ d.nFirst }}"><span style="flex:1;text-align:center;font-size:12px;padding:3px 0;border:1.5px solid #cfc8bb;border-radius:7px;background:#fbfaf6;color:#9a9286;cursor:pointer;">&#9312; First</span></sc-if>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isGuided }}">
+          <div style="max-width:760px;">
+            <div style="margin-bottom:20px;">
+              <div style="font-family:'Caveat',cursive;font-size:24px;margin-bottom:9px;"><span style="color:#9a9286;">1 &middot;</span> Which album is their <span style="background:#ffe08a;padding:0 6px;border:1.5px solid #2c2926;border-radius:6px;">best</span>?</div>
+              <div style="display:flex;gap:11px;overflow-x:auto;padding:4px 2px 10px;">
+                <sc-for list="{{ disco }}" as="d" hint-placeholder-count="6">
+                  <div style="width:92px;flex:0 0 auto;">
+                    <div style="width:92px;height:92px;border:1.5px solid #2c2926;border-radius:8px;background-color:#efece4;background-image:repeating-linear-gradient(45deg, rgba(44,41,38,.08) 0 6px, transparent 6px 12px);position:relative;"><sc-if value="{{ d.isBest }}"><span style="position:absolute;inset:-3px;border:3px solid #2c2926;border-radius:9px;box-shadow:0 0 0 4px #ffe08a;"></span><span style="position:absolute;left:4px;top:4px;font-size:12px;background:#ffe08a;border:1.5px solid #2c2926;border-radius:6px;padding:0 5px;">&#9733;</span></sc-if></div>
+                    <div style="font-size:12px;color:#6f6a60;margin-top:5px;line-height:1.1;">{{ d.al }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="margin-bottom:20px;">
+              <div style="font-family:'Caveat',cursive;font-size:24px;margin-bottom:9px;"><span style="color:#9a9286;">2 &middot;</span> Your personal <span style="background:#ffb1a3;padding:0 6px;border:1.5px solid #2c2926;border-radius:6px;">favorite</span>?</div>
+              <div style="display:flex;gap:11px;overflow-x:auto;padding:4px 2px 10px;">
+                <sc-for list="{{ disco }}" as="d" hint-placeholder-count="6">
+                  <div style="width:92px;flex:0 0 auto;">
+                    <div style="width:92px;height:92px;border:1.5px solid #2c2926;border-radius:8px;background-color:#efece4;background-image:repeating-linear-gradient(45deg, rgba(44,41,38,.08) 0 6px, transparent 6px 12px);position:relative;"><sc-if value="{{ d.isFav }}"><span style="position:absolute;inset:-3px;border:3px solid #2c2926;border-radius:9px;box-shadow:0 0 0 4px #ffb1a3;"></span><span style="position:absolute;left:4px;top:4px;font-size:12px;background:#ffb1a3;border:1.5px solid #2c2926;border-radius:6px;padding:0 5px;">&#9829;</span></sc-if></div>
+                    <div style="font-size:12px;color:#6f6a60;margin-top:5px;line-height:1.1;">{{ d.al }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="margin-bottom:22px;">
+              <div style="font-family:'Caveat',cursive;font-size:24px;margin-bottom:4px;"><span style="color:#9a9286;">3 &middot;</span> Where should a newcomer <span style="background:#9ee0c6;padding:0 6px;border:1.5px solid #2c2926;border-radius:6px;">start</span>?</div>
+              <div style="font-size:13px;color:#9a9286;font-family:ui-monospace,monospace;margin-bottom:9px;">this becomes the album you recommend to first-timers</div>
+              <div style="display:flex;gap:11px;overflow-x:auto;padding:4px 2px 10px;">
+                <sc-for list="{{ disco }}" as="d" hint-placeholder-count="6">
+                  <div style="width:92px;flex:0 0 auto;">
+                    <div style="width:92px;height:92px;border:1.5px solid #2c2926;border-radius:8px;background-color:#efece4;background-image:repeating-linear-gradient(45deg, rgba(44,41,38,.08) 0 6px, transparent 6px 12px);position:relative;"><sc-if value="{{ d.isFirst }}"><span style="position:absolute;inset:-3px;border:3px solid #2c2926;border-radius:9px;box-shadow:0 0 0 4px #9ee0c6;"></span><span style="position:absolute;left:4px;top:4px;font-size:12px;background:#9ee0c6;border:1.5px solid #2c2926;border-radius:6px;padding:0 5px;">&#9312;</span></sc-if></div>
+                    <div style="font-size:12px;color:#6f6a60;margin-top:5px;line-height:1.1;">{{ d.al }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <button style="font-family:'Patrick Hand',cursive;font-size:19px;padding:10px 24px;background:#2c2926;color:#f1ece1;border:2px solid #2c2926;border-radius:11px 8px 11px 8px;cursor:pointer;">Save my three &rarr;</button>
+          </div>
+        </sc-if>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isLogin }}">
+        <div data-screen-label="Login &middot; AT-proto" style="display:flex;gap:22px;justify-content:center;flex-wrap:wrap;padding:18px 0 6px;">
+          <div style="width:340px;border:2px solid #2c2926;border-radius:15px 11px 15px 11px;background:#fff;box-shadow:5px 6px 0 rgba(44,41,38,.1);padding:22px;">
+            <div style="display:flex;align-items:center;gap:9px;margin-bottom:4px;">
+              <div style="display:flex;border:2px solid #2c2926;border-radius:8px 6px 8px 6px;overflow:hidden;"><span style="width:20px;height:24px;display:flex;align-items:center;justify-content:center;background:#ffe08a;border-right:1.5px solid #2c2926;font-size:12px;">&#9733;</span><span style="width:20px;height:24px;display:flex;align-items:center;justify-content:center;background:#ffb1a3;border-right:1.5px solid #2c2926;font-size:12px;">&#9829;</span><span style="width:20px;height:24px;display:flex;align-items:center;justify-content:center;background:#9ee0c6;font-size:12px;">&#9312;</span></div>
+              <span style="font-family:'Caveat',cursive;font-weight:700;font-size:24px;">BFF</span>
+            </div>
+            <div style="font-size:16px;color:#6f6a60;margin-bottom:4px;">Tag the albums that matter.</div>
+            <div style="font-family:ui-monospace,monospace;font-size:11px;color:#9a9286;letter-spacing:1px;margin-bottom:16px;">A &middot; HANDLE-FIRST</div>
+            <div style="font-size:14px;color:#6f6a60;margin-bottom:5px;">your handle</div>
+            <div style="display:flex;align-items:center;border:2px solid #2c2926;border-radius:9px 7px 9px 7px;overflow:hidden;margin-bottom:14px;">
+              <span style="padding:9px 10px;background:#f1ece1;border-right:1.5px solid #2c2926;font-family:ui-monospace,monospace;font-size:15px;color:#6f6a60;">@</span>
+              <span style="padding:9px 11px;font-size:16px;color:#9a9286;">you.bsky.social</span>
+            </div>
+            <button style="width:100%;font-family:'Patrick Hand',cursive;font-size:18px;padding:10px;background:#2c2926;color:#f1ece1;border:2px solid #2c2926;border-radius:10px 8px 10px 8px;cursor:pointer;margin-bottom:12px;">Continue &rarr;</button>
+            <div style="text-align:center;font-size:14px;color:#6f6a60;text-decoration:underline wavy;cursor:pointer;margin-bottom:14px;">use a custom server (PDS)</div>
+            <div style="font-size:12px;color:#9a9286;line-height:1.5;border-top:1px dashed #cfc8bb;padding-top:11px;">Sign in with any AT&nbsp;Protocol account &mdash; Bluesky or your own server. We never see your password.</div>
+          </div>
+
+          <div style="width:340px;border:2px solid #2c2926;border-radius:11px 15px 11px 15px;background:#fff;box-shadow:5px 6px 0 rgba(44,41,38,.1);padding:22px;">
+            <div style="display:flex;align-items:center;gap:9px;margin-bottom:4px;">
+              <div style="display:flex;border:2px solid #2c2926;border-radius:8px 6px 8px 6px;overflow:hidden;"><span style="width:20px;height:24px;display:flex;align-items:center;justify-content:center;background:#ffe08a;border-right:1.5px solid #2c2926;font-size:12px;">&#9733;</span><span style="width:20px;height:24px;display:flex;align-items:center;justify-content:center;background:#ffb1a3;border-right:1.5px solid #2c2926;font-size:12px;">&#9829;</span><span style="width:20px;height:24px;display:flex;align-items:center;justify-content:center;background:#9ee0c6;font-size:12px;">&#9312;</span></div>
+              <span style="font-family:'Caveat',cursive;font-weight:700;font-size:24px;">BFF</span>
+            </div>
+            <div style="font-family:ui-monospace,monospace;font-size:11px;color:#9a9286;letter-spacing:1px;margin:6px 0 16px;">B &middot; CHOOSE YOUR SERVER</div>
+            <button style="width:100%;font-family:'Patrick Hand',cursive;font-size:17px;padding:11px;background:#2c2926;color:#f1ece1;border:2px solid #2c2926;border-radius:10px 8px 10px 8px;cursor:pointer;margin-bottom:12px;">Continue with bsky.social</button>
+            <div style="display:flex;align-items:center;gap:9px;color:#9a9286;font-size:13px;margin-bottom:12px;"><span style="flex:1;height:1px;background:#cfc8bb;"></span>or another instance<span style="flex:1;height:1px;background:#cfc8bb;"></span></div>
+            <div style="font-size:14px;color:#6f6a60;margin-bottom:5px;">AT-proto server URL</div>
+            <div style="border:2px solid #2c2926;border-radius:9px 7px 9px 7px;padding:9px 11px;font-family:ui-monospace,monospace;font-size:14px;color:#9a9286;margin-bottom:10px;">https://your-server.example</div>
+            <div style="font-size:14px;color:#6f6a60;margin-bottom:5px;">handle on that server</div>
+            <div style="border:2px solid #2c2926;border-radius:7px 9px 7px 9px;padding:9px 11px;font-size:15px;color:#9a9286;margin-bottom:14px;">you.example.social</div>
+            <button style="width:100%;font-family:'Patrick Hand',cursive;font-size:18px;padding:10px;background:#fff;color:#2c2926;border:2px solid #2c2926;border-radius:10px 8px 10px 8px;cursor:pointer;">Continue &rarr;</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isProfile }}">
+        <div data-screen-label="Profile">
+        <div style="display:flex;gap:16px;align-items:center;margin-bottom:20px;">
+          <div style="width:80px;height:80px;flex:0 0 auto;border-radius:50%;border:2px solid #2c2926;background-color:#efece4;background-image:repeating-linear-gradient(45deg, rgba(44,41,38,.1) 0 7px, transparent 7px 14px);display:flex;align-items:center;justify-content:center;font-family:'Caveat',cursive;font-size:34px;">Y</div>
+          <div>
+            <div style="font-family:'Caveat',cursive;font-weight:700;font-size:36px;line-height:.95;">@you.bsky.social</div>
+            <div style="font-size:15px;color:#6f6a60;margin-top:4px;">12 artists set &middot; 36 tags given &middot; joined 2026</div>
+          </div>
+          <div style="margin-left:auto;"><button style="font-family:'Patrick Hand',cursive;font-size:16px;padding:8px 16px;background:#fff;border:2px solid #2c2926;border-radius:10px 8px 10px 8px;cursor:pointer;">Edit picks</button></div>
+        </div>
+
+        <sc-if value="{{ isSets }}">
+          <div style="font-family:'Caveat',cursive;font-size:22px;margin-bottom:13px;">Your sets &mdash; one trio per artist</div>
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;">
+            <sc-for list="{{ sets }}" as="s" hint-placeholder-count="4">
+              <div style="border:2px solid #2c2926;border-radius:13px 9px 13px 9px;background:#fff;padding:13px;">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:11px;">
+                  <div style="width:40px;height:40px;flex:0 0 auto;border:1.5px solid #2c2926;border-radius:7px;background-color:#efece4;background-image:repeating-linear-gradient(45deg, rgba(44,41,38,.08) 0 5px, transparent 5px 10px);"></div>
+                  <div style="font-family:'Caveat',cursive;font-weight:700;font-size:23px;flex:1 1 auto;">{{ s.ar }}</div>
+                  <span style="font-size:13px;color:#9a9286;text-decoration:underline wavy;cursor:pointer;">view</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:9px;padding:6px 0;border-top:1px dashed #e2dccf;"><span style="width:74px;flex:0 0 auto;font-size:12px;padding:1px 0;text-align:center;border:1.5px solid #2c2926;border-radius:7px;background:#ffe08a;">&#9733; Best</span><span style="font-size:16px;">{{ s.best }}</span></div>
+                <div style="display:flex;align-items:center;gap:9px;padding:6px 0;border-top:1px dashed #e2dccf;"><span style="width:74px;flex:0 0 auto;font-size:12px;padding:1px 0;text-align:center;border:1.5px solid #2c2926;border-radius:7px;background:#ffb1a3;">&#9829; Favorite</span><span style="font-size:16px;">{{ s.fav }}</span></div>
+                <div style="display:flex;align-items:center;gap:9px;padding:6px 0;border-top:1px dashed #e2dccf;">
+                  <span style="width:74px;flex:0 0 auto;font-size:12px;padding:1px 0;text-align:center;border:1.5px solid #2c2926;border-radius:7px;background:#9ee0c6;">&#9312; First</span>
+                  <sc-if value="{{ s.first }}"><span style="font-size:16px;">{{ s.first }}</span></sc-if>
+                  <sc-if value="{{ s.noFirst }}"><span style="font-size:14px;color:#9a9286;font-family:ui-monospace,monospace;border:1.5px dashed #b9b2a4;border-radius:7px;padding:2px 9px;cursor:pointer;">+ set a starter</span></sc-if>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isTag }}">
+          <div style="display:flex;flex-direction:column;gap:18px;">
+            <div>
+              <div style="display:flex;align-items:center;gap:8px;font-family:'Caveat',cursive;font-weight:700;font-size:23px;margin-bottom:9px;"><span style="width:25px;height:25px;border:1.5px solid #2c2926;border-radius:50%;background:#ffe08a;display:flex;align-items:center;justify-content:center;font-size:12px;">&#9733;</span> Your Bests</div>
+              <div style="display:flex;gap:13px;overflow-x:auto;padding-bottom:8px;">
+                <sc-for list="{{ bests }}" as="b" hint-placeholder-count="3">
+                  <div style="width:124px;flex:0 0 auto;"><div style="width:124px;height:124px;border:1.5px solid #2c2926;border-radius:9px;background-color:#efece4;background-image:repeating-linear-gradient(45deg, rgba(44,41,38,.07) 0 7px, transparent 7px 14px);"></div><div style="font-size:15px;margin-top:6px;line-height:1.05;">{{ b.al }}</div><div style="font-size:12px;color:#9a9286;">{{ b.ar }}</div></div>
+                </sc-for>
+              </div>
+            </div>
+            <div>
+              <div style="display:flex;align-items:center;gap:8px;font-family:'Caveat',cursive;font-weight:700;font-size:23px;margin-bottom:9px;"><span style="width:25px;height:25px;border:1.5px solid #2c2926;border-radius:50%;background:#ffb1a3;display:flex;align-items:center;justify-content:center;font-size:12px;">&#9829;</span> Your Favorites</div>
+              <div style="display:flex;gap:13px;overflow-x:auto;padding-bottom:8px;">
+                <sc-for list="{{ favs }}" as="b" hint-placeholder-count="3">
+                  <div style="width:124px;flex:0 0 auto;"><div style="width:124px;height:124px;border:1.5px solid #2c2926;border-radius:9px;background-color:#efece4;background-image:repeating-linear-gradient(45deg, rgba(44,41,38,.07) 0 7px, transparent 7px 14px);"></div><div style="font-size:15px;margin-top:6px;line-height:1.05;">{{ b.al }}</div><div style="font-size:12px;color:#9a9286;">{{ b.ar }}</div></div>
+                </sc-for>
+              </div>
+            </div>
+            <div>
+              <div style="display:flex;align-items:center;gap:8px;font-family:'Caveat',cursive;font-weight:700;font-size:23px;margin-bottom:9px;"><span style="width:25px;height:25px;border:1.5px solid #2c2926;border-radius:50%;background:#9ee0c6;display:flex;align-items:center;justify-content:center;font-size:12px;">&#9312;</span> Your Firsts <span style="font-size:13px;font-family:'Patrick Hand',cursive;color:#9a9286;">&middot; what you'd hand a newcomer</span></div>
+              <div style="display:flex;gap:13px;overflow-x:auto;padding-bottom:8px;">
+                <sc-for list="{{ firsts }}" as="b" hint-placeholder-count="3">
+                  <div style="width:124px;flex:0 0 auto;"><div style="width:124px;height:124px;border:1.5px solid #2c2926;border-radius:9px;background-color:#efece4;background-image:repeating-linear-gradient(45deg, rgba(44,41,38,.07) 0 7px, transparent 7px 14px);"></div><div style="font-size:15px;margin-top:6px;line-height:1.05;">{{ b.al }}</div><div style="font-size:12px;color:#9a9286;">{{ b.ar }}</div></div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+        </div>
+      </sc-if>
+
+    </div>
+  </div>
+
+  <sc-if value="{{ showNotes }}">
+  <div style="max-width:1180px;margin:18px auto 0;">
+    <div style="display:inline-block;border:2px solid #2c2926;border-radius:13px 9px 13px 9px/9px 13px 9px 13px;background:#fffdf3;box-shadow:4px 5px 0 rgba(44,41,38,.1);padding:14px 18px;max-width:680px;transform:rotate(-.5deg);">
+      <div style="font-family:'Caveat',cursive;font-weight:700;font-size:22px;margin-bottom:4px;">the idea &rarr;</div>
+      <sc-if value="{{ isHome }}">
+        <sc-if value="{{ isDirA }}"><div style="font-size:16px;line-height:1.45;">Closest to your Rocksky reference. A familiar discovery grid where the <b>B/F/F badge rides on each card</b> instead of &ldquo;recently played.&rdquo; Leads with people you follow, back-fills with recent tags. <span style="color:#9a9286;">Fast to scan &mdash; but the three-way idea stays implicit.</span></div></sc-if>
+        <sc-if value="{{ isDirB }}"><div style="font-size:16px;line-height:1.45;">Makes the concept <b>literal</b> &mdash; three live streams of Best / Favorite / First side by side. Strongest identity; you instantly &ldquo;get&rdquo; the app. <span style="color:#9a9286;">Less room per item; can feel busy on smaller screens.</span></div></sc-if>
+        <sc-if value="{{ isDirC }}"><div style="font-size:16px;line-height:1.45;">Social &amp; narrative &mdash; full sentences, the tagger's note, and reactions. Best when the feed is really <b>about the people you follow</b>. <span style="color:#9a9286;">Lower density: fewer albums per screen.</span></div></sc-if>
+      </sc-if>
+      <sc-if value="{{ isArtist }}">
+        <sc-if value="{{ isSlots }}"><div style="font-size:16px;line-height:1.45;">Opinionated <b>&ldquo;set your three.&rdquo;</b> Drag an album from the discography into a labelled slot; one album per slot, swap anytime. <span style="color:#9a9286;">Great for first setup &mdash; drag can be fiddly for quick edits.</span></div></sc-if>
+        <sc-if value="{{ isToggles }}"><div style="font-size:16px;line-height:1.45;">Quickest edits &mdash; <b>tag any album inline</b>. Tags are exclusive, so re-tagging just moves the badge. A sticky bar shows your current trio. <span style="color:#9a9286;">Three buttons &times; N albums can get noisy.</span></div></sc-if>
+        <sc-if value="{{ isGuided }}"><div style="font-size:16px;line-height:1.45;">A calm <b>3-question flow</b> &mdash; perfect for onboarding or an empty artist. Note how &ldquo;First&rdquo; is framed as a recommendation to newcomers. <span style="color:#9a9286;">Slower if you just want to change one pick.</span></div></sc-if>
+      </sc-if>
+      <sc-if value="{{ isLogin }}"><div style="font-size:16px;line-height:1.45;">AT-proto means <b>sign in with a handle on any server</b>. <b>A</b> keeps it dead simple (handle first, advanced server link tucked away); <b>B</b> surfaces server choice up-front for self-hosters. <span style="color:#9a9286;">Real flow redirects to the user's PDS for OAuth &mdash; no password stored here.</span></div></sc-if>
+      <sc-if value="{{ isProfile }}">
+        <sc-if value="{{ isSets }}"><div style="font-size:16px;line-height:1.45;">Your library as <b>trios</b> &mdash; one Best / Favorite / First per artist. Empty slots (see Daft Punk) invite you to complete the set. <span style="color:#9a9286;">Mirrors how you tag, artist by artist.</span></div></sc-if>
+        <sc-if value="{{ isTag }}"><div style="font-size:16px;line-height:1.45;">Grouped <b>by tag</b> instead &mdash; scan everything you've named Best, then Favorite, then First. <span style="color:#9a9286;">Good for sharing &ldquo;here are all my starter picks.&rdquo;</span></div></sc-if>
+      </sc-if>
+    </div>
+  </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1240,&quot;height&quot;:1480},&quot;showNotes&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;followingFirst&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  state = { screen: 'home', dir: 'A', mech: 'slots', prof: 'sets' };
+
+  renderVals() {
+    const st = this.state;
+    const p = this.props || {};
+    const showNotes = p.showNotes ?? true;
+    const followingFirst = p.followingFirst ?? true;
+
+    const meta = { best: { l: 'Best', g: '\u2605' }, fav: { l: 'Favorite', g: '\u2665' }, first: { l: 'First', g: '\u2460' } };
+    const tag = (x) => ({ ...x, isBest: x.t === 'best', isFav: x.t === 'fav', isFirst: x.t === 'first', tl: meta[x.t].l, tg: meta[x.t].g });
+
+    const activity = [
+      { h: 'maya.bsky.social', i: 'M', al: 'In Rainbows', ar: 'Radiohead', t: 'best', tm: '2m', note: 'the warmth on this record is unreal.' },
+      { h: 'theo.bsky.social', i: 'T', al: 'Channel Orange', ar: 'Frank Ocean', t: 'fav', tm: '6m', note: 'i come back to side B every summer.' },
+      { h: 'juno.art', i: 'J', al: 'Discovery', ar: 'Daft Punk', t: 'first', tm: '11m', note: 'easiest doorway into their catalog.' },
+      { h: 'cleo.bsky.social', i: 'C', al: 'To Pimp a Butterfly', ar: 'Kendrick Lamar', t: 'best', tm: '18m', note: 'a peak. nothing else sounds like it.' },
+      { h: 'ravi.fm', i: 'R', al: 'Rumours', ar: 'Fleetwood Mac', t: 'fav', tm: '24m', note: '' },
+      { h: 'iris.bsky.social', i: 'I', al: 'Blue', ar: 'Joni Mitchell', t: 'first', tm: '31m', note: 'start here, then go anywhere.' },
+      { h: 'otis.bsky.social', i: 'O', al: 'OK Computer', ar: 'Radiohead', t: 'best', tm: '40m', note: '' },
+      { h: 'mona.bsky.social', i: 'N', al: 'Blonde', ar: 'Frank Ocean', t: 'fav', tm: '52m', note: '' },
+    ].map(tag);
+
+    const byT = (t) => activity.filter((a) => a.t === t);
+
+    const people = [
+      { h: 'maya', i: 'M' }, { h: 'theo', i: 'T' }, { h: 'juno', i: 'J' }, { h: 'cleo', i: 'C' },
+      { h: 'ravi', i: 'R' }, { h: 'iris', i: 'I' }, { h: 'otis', i: 'O' },
+    ];
+    const genres = ['Rock', 'Indie', 'Hip-Hop', 'Electronic', 'Jazz', 'Soul', 'Pop', 'Ambient'];
+
+    const disco = [
+      { al: 'Pablo Honey', y: '1993', t: '' },
+      { al: 'The Bends', y: '1995', t: 'first' },
+      { al: 'OK Computer', y: '1997', t: 'best' },
+      { al: 'Kid A', y: '2000', t: '' },
+      { al: 'Amnesiac', y: '2001', t: '' },
+      { al: 'Hail to the Thief', y: '2003', t: '' },
+      { al: 'In Rainbows', y: '2007', t: 'fav' },
+      { al: 'The King of Limbs', y: '2011', t: '' },
+      { al: 'A Moon Shaped Pool', y: '2016', t: '' },
+    ].map((d) => ({ ...d, isBest: d.t === 'best', isFav: d.t === 'fav', isFirst: d.t === 'first', nBest: d.t !== 'best', nFav: d.t !== 'fav', nFirst: d.t !== 'first' }));
+
+    const sets = [
+      { ar: 'Radiohead', best: 'OK Computer', fav: 'In Rainbows', first: 'The Bends' },
+      { ar: 'Frank Ocean', best: 'Blonde', fav: 'Channel Orange', first: 'Nostalgia, Ultra' },
+      { ar: 'Kendrick Lamar', best: 'To Pimp a Butterfly', fav: 'good kid, m.A.A.d city', first: 'Section.80' },
+      { ar: 'Daft Punk', best: 'Discovery', fav: 'Random Access Memories', first: '' },
+    ].map((s) => ({ ...s, noFirst: !s.first }));
+
+    const set = (o) => () => this.setState(o);
+    const urlPath = st.screen === 'home' ? '/feed' : st.screen === 'artist' ? '/artist/radiohead' : st.screen === 'login' ? '/sign-in' : '/you';
+
+    return {
+      showNotes, followingFirst, notFollowingFirst: !followingFirst,
+      urlPath,
+      isHome: st.screen === 'home', isArtist: st.screen === 'artist', isLogin: st.screen === 'login', isProfile: st.screen === 'profile',
+      notLogin: st.screen !== 'login',
+      goHome: set({ screen: 'home' }), goArtist: set({ screen: 'artist' }), goLogin: set({ screen: 'login' }), goProfile: set({ screen: 'profile' }),
+      isDirA: st.dir === 'A', isDirB: st.dir === 'B', isDirC: st.dir === 'C',
+      dirA: set({ dir: 'A' }), dirB: set({ dir: 'B' }), dirC: set({ dir: 'C' }),
+      isSlots: st.mech === 'slots', isToggles: st.mech === 'toggles', isGuided: st.mech === 'guided',
+      mSlots: set({ mech: 'slots' }), mToggles: set({ mech: 'toggles' }), mGuided: set({ mech: 'guided' }),
+      isSets: st.prof === 'sets', isTag: st.prof === 'tag',
+      pSets: set({ prof: 'sets' }), pTag: set({ prof: 'tag' }),
+      activity, bests: byT('best'), favs: byT('fav'), firsts: byT('first'), people, genres, disco, sets,
+    };
+  }
+}
+</script>
+</body>
+</html>
