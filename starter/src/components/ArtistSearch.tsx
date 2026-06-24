@@ -8,11 +8,12 @@ export default function ArtistSearch() {
   const [results, setResults] = useState<RockskyArtist[]>([]);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(-1);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!query.trim()) { setResults([]); setOpen(false); return; }
+    if (!query.trim()) { setResults([]); setOpen(false); setActiveIndex(-1); return; }
     setLoading(true);
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(async () => {
@@ -20,8 +21,10 @@ export default function ArtistSearch() {
         const hits = await searchArtists(query, 8);
         setResults(hits);
         setOpen(hits.length > 0);
+        setActiveIndex(-1);
       } catch {
         setResults([]);
+        setActiveIndex(-1);
       } finally {
         setLoading(false);
       }
@@ -35,9 +38,25 @@ export default function ArtistSearch() {
     setQuery('');
     setResults([]);
     setOpen(false);
-    navigate(`/artist/${key}`, {
-      state: { rockskyUri: artist.uri, picture: artist.picture, name: artist.name },
-    });
+    setActiveIndex(-1);
+    navigate(`/artist/${key}`, { state: { artist } });
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (!open) return;
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setActiveIndex(i => Math.min(i + 1, results.length - 1));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setActiveIndex(i => Math.max(i - 1, 0));
+    } else if (e.key === 'Escape') {
+      setOpen(false);
+      setActiveIndex(-1);
+    } else if (e.key === 'Enter' && activeIndex >= 0) {
+      e.preventDefault();
+      select(results[activeIndex]);
+    }
   }
 
   return (
@@ -52,6 +71,7 @@ export default function ArtistSearch() {
         <input
           value={query}
           onChange={e => setQuery(e.target.value)}
+          onKeyDown={handleKeyDown}
           placeholder="search artists, albums, people"
           style={{
             flex: 1, border: 'none', outline: 'none', background: 'transparent',
@@ -69,24 +89,33 @@ export default function ArtistSearch() {
           borderRadius: 'var(--r-card)', boxShadow: 'var(--shadow-elevated)',
           overflow: 'hidden',
         }}>
-          {results.map(artist => (
+          {results.map((artist, idx) => (
             <button
               key={artist.id}
               onClick={() => select(artist)}
+              onMouseEnter={() => setActiveIndex(idx)}
+              onMouseLeave={() => setActiveIndex(-1)}
               style={{
                 display: 'flex', alignItems: 'center', gap: 10, width: '100%',
-                padding: '10px 14px', border: 'none', background: 'none',
+                padding: '10px 14px', border: 'none',
+                background: idx === activeIndex ? 'var(--page-bg)' : 'none',
                 cursor: 'pointer', textAlign: 'left',
               }}
-              onMouseEnter={e => (e.currentTarget.style.background = 'var(--page-bg)')}
-              onMouseLeave={e => (e.currentTarget.style.background = 'none')}
             >
-              {artist.picture && (
+              {artist.picture ? (
                 <img
                   src={artist.picture}
                   alt=""
                   style={{ width: 32, height: 32, borderRadius: 6, objectFit: 'cover', flexShrink: 0 }}
                 />
+              ) : (
+                <div style={{
+                  width: 32, height: 32, borderRadius: 6, flexShrink: 0,
+                  background: 'var(--best)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontFamily: 'var(--font-display)', fontSize: 16, color: 'var(--on-brand)',
+                }}>
+                  {artist.name[0]?.toUpperCase() ?? '?'}
+                </div>
               )}
               <div>
                 <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--ink)' }}>{artist.name}</div>
