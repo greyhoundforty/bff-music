@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { searchArtists, toArtistRef, type RockskyArtist } from '../lib/rocksky';
+import { searchArtists, toArtistRef, type MBArtist } from '../lib/musicbrainz';
 import { artistKey } from '../lib/pick';
 
 export default function ArtistSearch() {
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<RockskyArtist[]>([]);
+  const [results, setResults] = useState<MBArtist[]>([]);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
@@ -32,7 +32,7 @@ export default function ArtistSearch() {
     return () => { if (timerRef.current) clearTimeout(timerRef.current); };
   }, [query]);
 
-  function select(artist: RockskyArtist) {
+  function select(artist: MBArtist) {
     const ref = toArtistRef(artist);
     const key = artistKey(ref);
     setQuery('');
@@ -102,24 +102,18 @@ export default function ArtistSearch() {
                 cursor: 'pointer', textAlign: 'left',
               }}
             >
-              {artist.picture ? (
-                <img
-                  src={artist.picture}
-                  alt=""
-                  style={{ width: 32, height: 32, borderRadius: 6, objectFit: 'cover', flexShrink: 0 }}
-                />
-              ) : (
-                <div style={{
-                  width: 32, height: 32, borderRadius: 6, flexShrink: 0,
-                  background: 'var(--best)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontFamily: 'var(--font-display)', fontSize: 16, color: 'var(--on-brand)',
-                }}>
-                  {artist.name[0]?.toUpperCase() ?? '?'}
-                </div>
-              )}
+              <div style={{
+                width: 32, height: 32, borderRadius: 6, flexShrink: 0,
+                background: 'var(--best)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontFamily: 'var(--font-display)', fontSize: 16, color: 'var(--on-brand)',
+              }}>
+                {artist.name[0]?.toUpperCase() ?? '?'}
+              </div>
               <div>
                 <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--ink)' }}>{artist.name}</div>
-                <div style={{ fontSize: 12, color: 'var(--faint)' }}>{artist.uniqueListeners.toLocaleString()} listeners</div>
+                {artist.disambiguation && (
+                  <div style={{ fontSize: 12, color: 'var(--faint)' }}>{artist.disambiguation}</div>
+                )}
               </div>
             </button>
           ))}

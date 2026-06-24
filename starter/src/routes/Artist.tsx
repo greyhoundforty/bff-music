@@ -3,25 +3,25 @@ import { useQuery } from '@tanstack/react-query';
 import Layout from '../components/Layout';
 import { useSession } from '../lib/session';
 import { putPick } from '../lib/pick';
-import { getArtistAlbums, toArtistRef, toAlbumRef, type RockskyArtist, type RockskyAlbum } from '../lib/rocksky';
+import { getArtistReleaseGroups, toArtistRef, toAlbumRef, coverUrl, type MBArtist, type MBReleaseGroup } from '../lib/musicbrainz';
 import type { PickKind } from '../lib/types';
 
 export default function Artist() {
   const { artistKey } = useParams<{ artistKey: string }>();
-  const { state } = useLocation() as { state?: { artist?: RockskyArtist } };
+  const { state } = useLocation() as { state?: { artist?: MBArtist } };
   const { session } = useSession();
 
-  const rockskyUri = state?.artist?.uri ?? null;
+  const mbid = state?.artist?.id ?? null;
   const artistName = state?.artist?.name ?? artistKey?.replace(/^name:/, '').replace(/-/g, ' ') ?? '—';
 
   const albumsQuery = useQuery({
-    queryKey: ['artist-albums', rockskyUri],
-    queryFn: () => getArtistAlbums(rockskyUri!, 60),
-    enabled: !!rockskyUri,
+    queryKey: ['artist-albums', mbid],
+    queryFn: () => getArtistReleaseGroups(mbid!, 100),
+    enabled: !!mbid,
     staleTime: 5 * 60_000,
   });
 
-  async function handlePick(album: RockskyAlbum, kind: PickKind) {
+  async function handlePick(album: MBReleaseGroup, kind: PickKind) {
     if (!session || !state?.artist) return;
     const artist = toArtistRef(state.artist);
     try {
@@ -35,12 +35,12 @@ export default function Artist() {
     <Layout>
       {/* ── Artist header ───────────────────────────────────────────────── */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 36 }}>
-        {state?.artist?.picture && (
-          <img src={state.artist.picture} alt="" style={{ width: 80, height: 80, borderRadius: 12, objectFit: 'cover', flexShrink: 0 }} />
-        )}
         <div>
           <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, letterSpacing: '2px', color: 'var(--faint)', textTransform: 'uppercase', marginBottom: 4 }}>Artist</div>
           <div style={{ fontFamily: 'var(--font-display)', fontSize: 46, lineHeight: 0.95 }}>{artistName}</div>
+          {state?.artist?.disambiguation && (
+            <div style={{ fontSize: 14, color: 'var(--faint)', marginTop: 6 }}>{state.artist.disambiguation}</div>
+          )}
         </div>
       </div>
 
@@ -53,7 +53,7 @@ export default function Artist() {
       {/* ── Discography ─────────────────────────────────────────────────── */}
       <div style={{ fontFamily: 'var(--font-display)', fontSize: 26, marginBottom: 16 }}>Discography</div>
 
-      {!rockskyUri && (
+      {!mbid && (
         <div style={{ color: 'var(--faint)', fontSize: 14 }}>
           Search for this artist using the top nav to load their discography.
         </div>
@@ -80,16 +80,20 @@ export default function Artist() {
 
 // ── Album card ────────────────────────────────────────────────────────────────
 
-function AlbumCard({ album, onPick }: { album: RockskyAlbum; onPick: (a: RockskyAlbum, k: PickKind) => void }) {
+function AlbumCard({ album, onPick }: { album: MBReleaseGroup; onPick: (a: MBReleaseGroup, k: PickKind) => void }) {
+  const imgSrc = coverUrl(album.id);
+  const year = album.firstReleaseDate?.slice(0, 4) ?? '';
   return (
     <div style={{ background: 'var(--surface)', border: '1px solid var(--hairline)', borderRadius: 'var(--r-card)', overflow: 'hidden', boxShadow: 'var(--shadow-card)' }}>
-      {album.albumArt
-        ? <img src={album.albumArt} alt={album.title} style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', display: 'block' }} />
-        : <div style={{ width: '100%', aspectRatio: '1', background: 'var(--ctrl-bg)' }} />
-      }
+      <img
+        src={imgSrc}
+        alt={album.title}
+        style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', display: 'block' }}
+        onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+      />
       <div style={{ padding: '10px 12px' }}>
         <div style={{ fontWeight: 600, fontSize: 13, color: 'var(--ink)', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{album.title}</div>
-        <div style={{ fontSize: 12, color: 'var(--faint)', marginBottom: 10 }}>{album.year}</div>
+        <div style={{ fontSize: 12, color: 'var(--faint)', marginBottom: 10 }}>{year}</div>
         <div style={{ display: 'flex', gap: 4 }}>
           {(['best', 'favorite', 'first'] as PickKind[]).map(kind => {
             const [label, color] = kind === 'best' ? ['★', 'var(--best)'] : kind === 'favorite' ? ['♥', 'var(--fav)'] : ['①', 'var(--first)'];
