@@ -40,7 +40,7 @@ export default function Discover() {
         </div>
       )}
 
-      {grouped && (
+      {grouped && picksQuery.data && picksQuery.data.length > 0 && (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
           {(['best', 'favorite', 'first'] as const).map(kind => {
             const meta = KIND_META[kind];
@@ -62,7 +62,7 @@ export default function Discover() {
                     No {meta.label.toLowerCase()} picks yet from people you follow.
                   </div>
                 )}
-                {picks.map((ap, i) => <PickCard key={i} ap={ap} kind={kind} />)}
+                {picks.map(ap => <PickCard key={ap.pick.uri} ap={ap} kind={kind} />)}
               </div>
             );
           })}

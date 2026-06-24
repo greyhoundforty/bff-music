@@ -24,7 +24,11 @@ export default function Artist() {
   async function handlePick(album: RockskyAlbum, kind: PickKind) {
     if (!session || !state?.artist) return;
     const artist = toArtistRef(state.artist);
-    await putPick(session.agent, { kind, artist, album: toAlbumRef(album) });
+    try {
+      await putPick(session.agent, { kind, artist, album: toAlbumRef(album) });
+    } catch (err) {
+      console.error('[BFF] putPick failed:', err);
+    }
   }
 
   return (
