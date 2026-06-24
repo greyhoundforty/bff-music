@@ -1,6 +1,7 @@
 import { type ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSession } from '../lib/session';
+import ArtistSearch from './ArtistSearch';
 
 /**
  * Top bar + content wrapper shared by all authed screens.
@@ -64,16 +65,8 @@ export default function Layout({ children }: { children: ReactNode }) {
 
           <div style={{ flex: 1 }} />
 
-          {/* Search (decorative for now) */}
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: 9,
-            background: 'var(--surface)', border: '1px solid var(--hairline-2)',
-            borderRadius: 'var(--r-input)', padding: '9px 13px',
-            minWidth: 248, color: 'var(--faint)', fontSize: 14,
-          }}>
-            <span>⌖</span>
-            <span>search artists, albums, people</span>
-          </div>
+          {/* Search */}
+          <ArtistSearch />
 
           {/* Sign out */}
           <button onClick={handleSignOut} style={{
