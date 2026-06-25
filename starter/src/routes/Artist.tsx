@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import Layout from '../components/Layout';
@@ -6,10 +7,14 @@ import { putPick } from '../lib/pick';
 import { getArtistReleaseGroups, toArtistRef, toAlbumRef, coverUrl, type MBArtist, type MBReleaseGroup } from '../lib/musicbrainz';
 import type { PickKind } from '../lib/types';
 
+type DiscographyFilter = 'studio' | 'all';
+
 export default function Artist() {
   const { artistKey } = useParams<{ artistKey: string }>();
   const { state } = useLocation() as { state?: { artist?: MBArtist } };
   const { session } = useSession();
+
+  const [filter, setFilter] = useState<DiscographyFilter>('studio');
 
   const mbid = state?.artist?.id ?? null;
   const artistName = state?.artist?.name ?? artistKey?.replace(/^name:/, '').replace(/-/g, ' ') ?? '—';
@@ -51,7 +56,26 @@ export default function Artist() {
       </div>
 
       {/* ── Discography ─────────────────────────────────────────────────── */}
-      <div style={{ fontFamily: 'var(--font-display)', fontSize: 26, marginBottom: 16 }}>Discography</div>
+      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 16 }}>
+        <div style={{ fontFamily: 'var(--font-display)', fontSize: 26 }}>Discography</div>
+        <div style={{ display: 'flex', gap: 4 }}>
+          {([['studio', 'Albums & EPs'], ['all', 'Singles & more']] as [DiscographyFilter, string][]).map(([v, label]) => (
+            <button
+              key={v}
+              onClick={() => setFilter(v)}
+              style={{
+                padding: '4px 12px', borderRadius: 20, fontSize: 12, cursor: 'pointer',
+                fontFamily: 'var(--font-ui)', fontWeight: 500,
+                border: '1px solid var(--hairline)',
+                background: filter === v ? 'var(--ink)' : 'transparent',
+                color: filter === v ? 'var(--page-bg)' : 'var(--ink-2)',
+              }}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
 
       {!mbid && (
         <div style={{ color: 'var(--faint)', fontSize: 14 }}>
@@ -67,13 +91,18 @@ export default function Artist() {
         </div>
       )}
 
-      {albumsQuery.data && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 14 }}>
-          {albumsQuery.data.map(album => (
-            <AlbumCard key={album.id} album={album} onPick={handlePick} />
-          ))}
-        </div>
-      )}
+      {albumsQuery.data && (() => {
+        const displayed = filter === 'studio'
+          ? albumsQuery.data.filter(rg => rg.primaryType === 'Album' || rg.primaryType === 'EP')
+          : albumsQuery.data;
+        return (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 14 }}>
+            {displayed.map(album => (
+              <AlbumCard key={album.id} album={album} onPick={handlePick} />
+            ))}
+          </div>
+        );
+      })()}
     </Layout>
   );
 }
