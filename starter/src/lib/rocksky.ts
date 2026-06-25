@@ -20,6 +20,19 @@ export interface RockskyFollow {
   avatar: string;
 }
 
+export interface RockskyAlbum {
+  id: string;
+  uri: string;
+  title: string;
+  artist: string;
+  artistUri: string;
+  year: number;
+  albumArt: string;
+  releaseDate: string;
+  playCount: number;
+  uniqueListeners: number;
+}
+
 /** Fetch accounts the given DID follows on Rocksky. */
 export async function getRockskyFollows(did: string, limit = 100): Promise<RockskyFollow[]> {
   const data = await xrpc<{ follows: RockskyFollow[] }>(
@@ -27,4 +40,13 @@ export async function getRockskyFollows(did: string, limit = 100): Promise<Rocks
     { actor: did, limit },
   );
   return data.follows ?? [];
+}
+
+/** Fetch globally popular albums on Rocksky, sorted by play count. */
+export async function getTopAlbums(limit = 30): Promise<RockskyAlbum[]> {
+  const data = await xrpc<{ albums: RockskyAlbum[] }>(
+    'app.rocksky.album.getAlbums',
+    { limit },
+  );
+  return data.albums ?? [];
 }

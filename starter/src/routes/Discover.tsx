@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import Layout from '../components/Layout';
 import { useSession } from '../lib/session';
 import { fetchFollowsPicks, groupPicksByKind, type AuthoredPick } from '../lib/discover';
+import { getTopAlbums, type RockskyAlbum } from '../lib/rocksky';
 
 const KIND_META = {
   best:     { label: 'Best',     glyph: '★', color: 'var(--best)',  tint: 'var(--best-tint)',  ink: 'var(--best-ink)',  caption: 'the peak' },
@@ -11,6 +12,12 @@ const KIND_META = {
 
 export default function Discover() {
   const { session } = useSession();
+
+  const trendingQuery = useQuery({
+    queryKey: ['rocksky-trending'],
+    queryFn: () => getTopAlbums(30),
+    staleTime: 5 * 60_000,
+  });
 
   const picksQuery = useQuery({
     queryKey: ['discover-feed', session?.did],
@@ -30,52 +37,104 @@ export default function Discover() {
         Discover
       </div>
 
-      {picksQuery.isLoading && (
-        <div style={{ color: 'var(--faint)', fontSize: 14 }}>Loading picks from people you follow…</div>
-      )}
-
-      {picksQuery.isError && (
-        <div style={{ color: 'var(--fav)', fontSize: 14 }}>
-          Couldn't load feed: {(picksQuery.error as Error).message}
+      {/* ── Trending on Rocksky ───────────────────────────────────────────── */}
+      <section style={{ marginBottom: 48 }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 16 }}>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: 24 }}>Trending on Rocksky</div>
+          {trendingQuery.isLoading && (
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--faint)' }}>loading…</span>
+          )}
         </div>
-      )}
 
-      {grouped && picksQuery.data && picksQuery.data.length > 0 && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
-          {(['best', 'favorite', 'first'] as const).map(kind => {
-            const meta = KIND_META[kind];
-            const picks = grouped[kind];
-            return (
-              <div key={kind}>
-                {/* Column header */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-                  <span style={{ width: 24, height: 24, borderRadius: 6, background: meta.color, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--on-brand)', fontSize: 12, flexShrink: 0 }}>{meta.glyph}</span>
-                  <div>
-                    <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, lineHeight: 1 }}>{meta.label}</div>
-                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--faint)', letterSpacing: '1px' }}>{meta.caption.toUpperCase()}</div>
+        {trendingQuery.isError && (
+          <div style={{ color: 'var(--fav)', fontSize: 14 }}>
+            Couldn't load Rocksky charts: {(trendingQuery.error as Error).message}
+          </div>
+        )}
+
+        {trendingQuery.data && (
+          <div style={{ display: 'flex', gap: 12, overflowX: 'auto', paddingBottom: 8 }}>
+            {trendingQuery.data.map(album => (
+              <TrendingCard key={album.id} album={album} />
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* ── Picks from Rocksky follows ────────────────────────────────────── */}
+      <section>
+        <div style={{ fontFamily: 'var(--font-display)', fontSize: 24, marginBottom: 16 }}>
+          Picks from people you follow
+        </div>
+
+        {picksQuery.isLoading && (
+          <div style={{ color: 'var(--faint)', fontSize: 14 }}>Checking your Rocksky follows…</div>
+        )}
+
+        {picksQuery.isError && (
+          <div style={{ color: 'var(--fav)', fontSize: 14 }}>
+            Couldn't load follows: {(picksQuery.error as Error).message}
+          </div>
+        )}
+
+        {grouped && picksQuery.data && picksQuery.data.length > 0 && (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
+            {(['best', 'favorite', 'first'] as const).map(kind => {
+              const meta = KIND_META[kind];
+              const picks = grouped[kind];
+              return (
+                <div key={kind}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+                    <span style={{ width: 24, height: 24, borderRadius: 6, background: meta.color, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--on-brand)', fontSize: 12, flexShrink: 0 }}>{meta.glyph}</span>
+                    <div>
+                      <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, lineHeight: 1 }}>{meta.label}</div>
+                      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--faint)', letterSpacing: '1px' }}>{meta.caption.toUpperCase()}</div>
+                    </div>
                   </div>
+                  {picks.length === 0 && (
+                    <div style={{ fontSize: 13, color: 'var(--faint)', padding: '12px 0' }}>
+                      No {meta.label.toLowerCase()} picks yet.
+                    </div>
+                  )}
+                  {picks.map(ap => <PickCard key={ap.pick.uri} ap={ap} kind={kind} />)}
                 </div>
+              );
+            })}
+          </div>
+        )}
 
-                {/* Cards */}
-                {picks.length === 0 && (
-                  <div style={{ fontSize: 13, color: 'var(--faint)', padding: '12px 0' }}>
-                    No {meta.label.toLowerCase()} picks yet from people you follow.
-                  </div>
-                )}
-                {picks.map(ap => <PickCard key={ap.pick.uri} ap={ap} kind={kind} />)}
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {grouped && picksQuery.data?.length === 0 && (
-        <div style={{ marginTop: 16, fontSize: 14, color: 'var(--faint)' }}>
-          Follow people on Bluesky or Rocksky to see their picks here.
-          {/* TODO(AppView): replace follows-merge with app.bff.getDiscoverFeed once AppView is live */}
-        </div>
-      )}
+        {grouped && picksQuery.data?.length === 0 && (
+          <div style={{ fontSize: 14, color: 'var(--faint)', lineHeight: 1.6 }}>
+            None of your Rocksky follows have BFF picks yet — this will fill in as the community grows.
+            {/* TODO(AppView): replace with app.bff.getDiscoverFeed once an AppView is live */}
+          </div>
+        )}
+      </section>
     </Layout>
+  );
+}
+
+// ── Trending card ─────────────────────────────────────────────────────────────
+
+function TrendingCard({ album }: { album: RockskyAlbum }) {
+  return (
+    <div style={{
+      flexShrink: 0, width: 148,
+      background: 'var(--surface)', border: '1px solid var(--hairline)',
+      borderRadius: 'var(--r-card)', overflow: 'hidden', boxShadow: 'var(--shadow-card)',
+    }}>
+      {album.albumArt
+        ? <img src={album.albumArt} alt={album.title} style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', display: 'block' }} />
+        : <div style={{ width: '100%', aspectRatio: '1', background: 'var(--ctrl-bg)' }} />
+      }
+      <div style={{ padding: '8px 10px' }}>
+        <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{album.title}</div>
+        <div style={{ fontSize: 11, color: 'var(--muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginTop: 1 }}>{album.artist}</div>
+        <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--faint)', marginTop: 4 }}>
+          {album.uniqueListeners.toLocaleString()} listeners
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -98,9 +157,8 @@ function PickCard({ ap, kind }: { ap: AuthoredPick; kind: keyof typeof KIND_META
   return (
     <div style={{ background: 'var(--surface)', border: '1px solid var(--hairline)', borderRadius: 'var(--r-card)', padding: '12px 14px', marginBottom: 10, boxShadow: 'var(--shadow-card)' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-        {/* Cover */}
         {album.coverUrl
-          ? <img src={album.coverUrl} alt="" style={{ width: 52, height: 52, borderRadius: 6, objectFit: 'cover', flexShrink: 0, boxShadow: 'inset 0 0 0 1px rgba(0,0,0,.07)' }} />
+          ? <img src={album.coverUrl} alt="" style={{ width: 52, height: 52, borderRadius: 6, objectFit: 'cover', flexShrink: 0 }} />
           : <div style={{ width: 52, height: 52, borderRadius: 6, background: meta.tint, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: meta.ink, fontSize: 20 }}>{meta.glyph}</div>
         }
         <div style={{ flex: 1, minWidth: 0 }}>
@@ -108,9 +166,7 @@ function PickCard({ ap, kind }: { ap: AuthoredPick; kind: keyof typeof KIND_META
           <div style={{ fontSize: 12, color: 'var(--muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{artist.name}</div>
         </div>
       </div>
-
       {note && <div style={{ fontSize: 13, color: 'var(--ink-2)', marginTop: 8, lineHeight: 1.4 }}>{note}</div>}
-
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 8 }}>
         {authorAvatar
           ? <img src={authorAvatar} alt="" style={{ width: 16, height: 16, borderRadius: '50%' }} />
