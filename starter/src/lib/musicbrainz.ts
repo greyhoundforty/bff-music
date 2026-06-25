@@ -26,7 +26,15 @@ export interface MBReleaseGroup {
   title: string;
   primaryType?: string;
   firstReleaseDate?: string;
+  secondaryTypes?: string[];
 }
+
+// Secondary types that indicate non-studio releases — excluded from the discography grid.
+const EXCLUDED_SECONDARY = new Set([
+  'Compilation', 'Live', 'Remix', 'DJ-mix', 'Mixtape/Street',
+  'Demo', 'Interview', 'Spokenword', 'Audiobook', 'Audio drama',
+  'Field recording', 'Broadcast',
+]);
 
 export function toArtistRef(artist: MBArtist): ArtistRef {
   return { name: artist.name, mbid: artist.id };
@@ -73,12 +81,16 @@ export async function getArtistReleaseGroups(mbid: string, limit = 100): Promise
       title: string;
       'primary-type'?: string;
       'first-release-date'?: string;
+      'secondary-types'?: string[];
     }>;
-  }>('/release-group', { artist: mbid, type: 'album|ep', limit: String(limit) });
-  return (data['release-groups'] ?? []).map(rg => ({
-    id: rg.id,
-    title: rg.title,
-    primaryType: rg['primary-type'],
-    firstReleaseDate: rg['first-release-date'],
-  }));
+  }>('/release-group', { artist: mbid, type: 'album|single|ep', limit: String(limit) });
+  return (data['release-groups'] ?? [])
+    .map(rg => ({
+      id: rg.id,
+      title: rg.title,
+      primaryType: rg['primary-type'],
+      firstReleaseDate: rg['first-release-date'],
+      secondaryTypes: rg['secondary-types'] ?? [],
+    }))
+    .filter(rg => !rg.secondaryTypes?.some(t => EXCLUDED_SECONDARY.has(t)));
 }
