@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import Layout from '../components/Layout';
 import { useSession } from '../lib/session';
-import { putPick } from '../lib/pick';
+import { putPick, listMyPicks, deletePick, artistKey as makeArtistKey } from '../lib/pick';
 import { getArtistReleaseGroups, toArtistRef, toAlbumRef, coverUrl, type MBArtist, type MBReleaseGroup } from '../lib/musicbrainz';
-import type { PickKind } from '../lib/types';
+import type { PickKind, PickRecord } from '../lib/types';
 
 type DiscographyFilter = 'studio' | 'all';
 
@@ -15,6 +15,7 @@ export default function Artist() {
   const { session } = useSession();
 
   const [filter, setFilter] = useState<DiscographyFilter>('studio');
+  const queryClient = useQueryClient();
 
   const mbid = state?.artist?.id ?? null;
   const artistName = state?.artist?.name ?? artistKey?.replace(/^name:/, '').replace(/-/g, ' ') ?? '—';
@@ -26,13 +27,46 @@ export default function Artist() {
     staleTime: 5 * 60_000,
   });
 
+  const myPicksQuery = useQuery({
+    queryKey: ['my-picks', session?.did],
+    queryFn: () => listMyPicks(session!.agent),
+    enabled: !!session,
+    staleTime: 30_000,
+  });
+
+  // kind → the PickRecord the user has set for this artist (if any)
+  const artistPicksByKind = useMemo((): Partial<Record<PickKind, PickRecord>> => {
+    if (!myPicksQuery.data || !state?.artist) return {};
+    const prefix = makeArtistKey(toArtistRef(state.artist)) + '.';
+    const map: Partial<Record<PickKind, PickRecord>> = {};
+    for (const pick of myPicksQuery.data) {
+      const rkey = pick.uri.split('/').pop() ?? '';
+      if (rkey.startsWith(prefix)) map[pick.value.kind] = pick;
+    }
+    return map;
+  }, [myPicksQuery.data, state?.artist]);
+
+  // Which kinds are actively picked for a given album?
+  function activeKindsFor(album: MBReleaseGroup): Set<PickKind> {
+    const active = new Set<PickKind>();
+    for (const kind of ['best', 'favorite', 'first'] as PickKind[]) {
+      if (artistPicksByKind[kind]?.value.album?.mbid === album.id) active.add(kind);
+    }
+    return active;
+  }
+
   async function handlePick(album: MBReleaseGroup, kind: PickKind) {
     if (!session || !state?.artist) return;
     const artist = toArtistRef(state.artist);
     try {
-      await putPick(session.agent, { kind, artist, album: toAlbumRef(album) });
+      if (activeKindsFor(album).has(kind)) {
+        await deletePick(session.agent, artist, kind);
+      } else {
+        await putPick(session.agent, { kind, artist, album: toAlbumRef(album) });
+      }
+      queryClient.invalidateQueries({ queryKey: ['my-picks', session.did] });
     } catch (err) {
-      console.error('[BFF] putPick failed:', err);
+      console.error('[BFF] pick action failed:', err);
     }
   }
 
@@ -98,7 +132,7 @@ export default function Artist() {
         return (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 14 }}>
             {displayed.map(album => (
-              <AlbumCard key={album.id} album={album} onPick={handlePick} />
+              <AlbumCard key={album.id} album={album} activeKinds={activeKindsFor(album)} onPick={handlePick} />
             ))}
           </div>
         );
@@ -109,11 +143,20 @@ export default function Artist() {
 
 // ── Album card ────────────────────────────────────────────────────────────────
 
-function AlbumCard({ album, onPick }: { album: MBReleaseGroup; onPick: (a: MBReleaseGroup, k: PickKind) => void }) {
+function AlbumCard({ album, activeKinds, onPick }: {
+  album: MBReleaseGroup;
+  activeKinds: Set<PickKind>;
+  onPick: (a: MBReleaseGroup, k: PickKind) => void;
+}) {
   const imgSrc = coverUrl(album.id);
   const year = album.firstReleaseDate?.slice(0, 4) ?? '';
+  const isPicked = activeKinds.size > 0;
   return (
-    <div style={{ background: 'var(--surface)', border: '1px solid var(--hairline)', borderRadius: 'var(--r-card)', overflow: 'hidden', boxShadow: 'var(--shadow-card)' }}>
+    <div style={{
+      background: 'var(--surface)',
+      border: `1px solid ${isPicked ? 'var(--best-bd)' : 'var(--hairline)'}`,
+      borderRadius: 'var(--r-card)', overflow: 'hidden', boxShadow: 'var(--shadow-card)',
+    }}>
       <img
         src={imgSrc}
         alt={album.title}
@@ -126,15 +169,19 @@ function AlbumCard({ album, onPick }: { album: MBReleaseGroup; onPick: (a: MBRel
         <div style={{ display: 'flex', gap: 4 }}>
           {(['best', 'favorite', 'first'] as PickKind[]).map(kind => {
             const [label, color] = kind === 'best' ? ['★', 'var(--best)'] : kind === 'favorite' ? ['♥', 'var(--fav)'] : ['①', 'var(--first)'];
+            const active = activeKinds.has(kind);
             return (
               <button
                 key={kind}
                 onClick={() => onPick(album, kind)}
-                title={`Mark as ${kind}`}
+                title={active ? `Remove ${kind} pick` : `Mark as ${kind}`}
                 style={{
-                  flex: 1, border: 'none', borderRadius: 6, background: 'var(--page-bg)',
-                  color, fontSize: 13, cursor: 'pointer', padding: '5px 0',
-                  fontWeight: 600,
+                  flex: 1, border: `1.5px solid ${active ? color : 'transparent'}`,
+                  borderRadius: 6,
+                  background: active ? color : 'var(--page-bg)',
+                  color: active ? 'var(--on-brand)' : color,
+                  fontSize: 13, cursor: 'pointer', padding: '5px 0', fontWeight: 600,
+                  transition: 'background 120ms, color 120ms',
                 }}
               >
                 {label}
