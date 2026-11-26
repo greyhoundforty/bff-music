@@ -27,7 +27,12 @@ function Harness({ disabled = false }: { disabled?: boolean }) {
 
 const input = () => screen.getByRole('combobox') as HTMLInputElement;
 const listbox = () => screen.queryByRole('listbox');
-const type = (text: string) => fireEvent.change(input(), { target: { value: text } });
+// Real typing happens in a focused field; focus first so focus-dependent
+// behaviour is exercised the way a browser would.
+const type = (text: string) => {
+  act(() => input().focus());
+  fireEvent.change(input(), { target: { value: text } });
+};
 const debounce = () => act(() => vi.advanceTimersByTimeAsync(250));
 // fireEvent returns false when the handler called preventDefault(); in a
 // browser that is what stops Enter from submitting the form.
@@ -114,6 +119,37 @@ describe('HandleTypeahead', () => {
     expect(input().getAttribute('aria-activedescendant')).toBeNull();
     expect(pressEnter()).toBe(true);
     expect(input().value).toBe('grey');
+  });
+
+  it('results arriving after the field loses focus do not open the list', async () => {
+    render(<Harness />);
+    search.mockResolvedValue(HITS);
+    type('grey');
+    act(() => input().blur()); // tab or click away before the debounce fires
+    await debounce();
+    expect(listbox()).toBeNull();
+  });
+
+  it('re-enabling after a failed sign-in does not pop the list over the error', async () => {
+    const { rerender } = render(<Harness />);
+    await showResults();
+    // Continue pressed: focus leaves the field (a click focuses the button;
+    // a browser also drops focus from a field it disables), then sign-in is
+    // pending. jsdom won't blur an already-disabled field, so blur first.
+    act(() => input().blur());
+    rerender(<Harness disabled />);
+    rerender(<Harness />); // sign-in threw: field enabled again, same text
+    await debounce();
+    expect(listbox()).toBeNull();
+  });
+
+  it('typing after ArrowDown clears the highlight so Enter submits the typed text', async () => {
+    render(<Harness />);
+    await showResults();
+    fireEvent.keyDown(input(), { key: 'ArrowDown' });
+    type('grey.example.com'); // old list still showing; new search pending
+    expect(pressEnter()).toBe(true);
+    expect(input().value).toBe('grey.example.com');
   });
 
   it('Escape closes the list', async () => {

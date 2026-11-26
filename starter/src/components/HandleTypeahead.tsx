@@ -35,6 +35,7 @@ export default function HandleTypeahead({ value, onChange, disabled = false }: P
   const requestId = useRef(0);
   const abortRef = useRef<AbortController | null>(null);
   const justSelected = useRef<string | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const listId = useId();
 
   function close() {
@@ -60,7 +61,10 @@ export default function HandleTypeahead({ value, onChange, disabled = false }: P
         const hits = await searchHandles(value, LIMIT, controller.signal);
         if (id !== requestId.current) return; // a newer query owns the list
         setResults(hits);
-        setOpen(hits.length > 0);
+        // Only open for someone still in the field: results can land after a
+        // blur, or after a failed sign-in re-enables it, and nothing would
+        // ever close a list opened then.
+        setOpen(hits.length > 0 && document.activeElement === inputRef.current);
         setActiveIndex(-1);
       } catch {
         if (id !== requestId.current) return;
@@ -83,6 +87,9 @@ export default function HandleTypeahead({ value, onChange, disabled = false }: P
 
   function handleChange(next: string) {
     justSelected.current = null;
+    // The highlighted row belongs to the old text; Enter must not pick it.
+    setActiveIndex(-1);
+    setHoverIndex(-1);
     onChange(next);
   }
 
@@ -109,6 +116,7 @@ export default function HandleTypeahead({ value, onChange, disabled = false }: P
   return (
     <>
       <input
+        ref={inputRef}
         type="text"
         role="combobox"
         aria-autocomplete="list"
