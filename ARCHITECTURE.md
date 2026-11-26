@@ -117,8 +117,9 @@ starter/
 ```bash
 cd starter
 npm install
-npm run dev      # http://localhost:5173  — sign in with a real Bluesky handle (dev loopback client)
+npm run dev      # http://127.0.0.1:5173  — sign in with a real Bluesky handle (dev loopback client)
 ```
+The dev server binds `127.0.0.1` (RFC 8252 loopback redirects can't use `localhost`). The port is 5173 by default, or `$SESH_SESSION_PORT` when set. Sesh sets that variable per worktree session, so parallel sessions each get their own port. When the variable is set, Vite exits if the port is taken instead of moving to another one. The OAuth redirect comes from the page's origin, so any port works.
 For production: host `public/client-metadata.json` at your domain, set its `client_id`/`redirect_uris` to your origin, and set `VITE_OAUTH_CLIENT_ID` (see `oauth.ts`).
 
 ## Suggested build order (next phase)
