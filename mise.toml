@@ -4,6 +4,7 @@
 
 [tools]
 node = "lts"
+watchexec = "2.8.0"   # used by `mise watch` (serve:watch)
 
 [tasks."test:setup"]
 description = "Install starter/ dependencies"
@@ -59,6 +60,27 @@ for port in ${SESH_SESSION_PORT:-5173 8080}; do
   fi
 done
 '''
+
+# Rebuilds and restarts the Node server whenever app or server sources change.
+# Dependencies install once up front: a restart that re-ran `npm ci` would
+# kill it mid-install. After changing package.json, restart serve:watch.
+# Test files also trigger a rebuild: mise 2026.6.5 doesn't pass -i/--ignore
+# through to watchexec.
+[tasks."serve:watch"]
+description = "Serve, then rebuild and restart on source changes"
+depends = ["test:setup"]
+run = """
+mise watch serve:once --restart --debounce 500ms \
+  -w starter/src -w starter/public -w server \
+  -w starter/index.html -w starter/vite.config.ts
+"""
+
+# One build-and-serve cycle with no dependency step, for serve:watch.
+# `exec` makes node the process watchexec signals on restart.
+[tasks."serve:once"]
+hide = true
+run = "npm --prefix starter run build && exec node server/index.js"
+env = { HOST = "0.0.0.0", PORT = "{{ get_env(name='SESH_SESSION_PORT', default='8080') }}" }
 
 [tasks.restart]
 description = "Stop whatever is running, rebuild, and serve again"
