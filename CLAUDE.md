@@ -25,7 +25,7 @@ Stand up the app skeleton and make **auth + routing** work end to end, with the 
 - [ ] `pick.ts` exports typed `putPick` / `listMyPicks` / `deletePick` (bodies may be TODO but signatures + rkey logic are real).
 
 ## Watch out for
-- **Client metadata / `client_id`.** In dev, use the loopback client (no hosted metadata needed). For prod you must host `client-metadata.json` and point `client_id` at its URL — see `oauth.ts` comments.
+- **Client metadata / `client_id`.** In dev, use the loopback client (no hosted metadata needed). In prod, nothing is baked in: the Node server builds `/client-metadata.json` per request from the forwarded host (`server/metadata.js`), and `oauth.ts` uses `<origin>/client-metadata.json` as `client_id`, so one image works at any URL. Don't reintroduce a static `public/client-metadata.json`; it would hardcode one deployment's URL. `APP_URL` (container env) pins the origin; `VITE_OAUTH_CLIENT_ID` (build arg) overrides the client_id only when the metadata is hosted elsewhere.
 - **Scope must include `transition:generic`** or `putRecord` will be rejected.
 - **Run `oauthClient.init()` once on app load** before deciding auth state; it both completes a pending callback and restores an existing session.
 - Album/artist references are embedded strings + optional MBID, **not** atproto records — don't try to create records for albums.

@@ -6,20 +6,17 @@ export const OAUTH_SCOPE = 'atproto transition:generic';
 
 // Loopback clients (http://localhost?redirect_uri=...) need no hosted metadata.
 // RFC 8252 forbids "localhost" in redirect_uri, so the callback uses 127.0.0.1.
-// A production build served from a public host must set VITE_OAUTH_CLIENT_ID to
-// the https URL of client-metadata.json. That value is ignored on loopback so
-// `mise run serve` can sign in without a hosted client.
+// On a public host the client_id is `${origin}/client-metadata.json`, which the
+// Node server (server/metadata.js) builds per request, so one image works at
+// any URL. VITE_OAUTH_CLIENT_ID overrides that when the metadata lives
+// elsewhere. Both are ignored on loopback so `mise run serve` can sign in
+// without a hosted client.
 const LOOPBACK_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]']);
 
 export function resolveClientId(origin: string, configuredClientId?: string): string {
   const page = new URL(origin);
   if (!LOOPBACK_HOSTS.has(page.hostname)) {
-    if (!configuredClientId) {
-      throw new Error(
-        'VITE_OAUTH_CLIENT_ID is not set. Set it to the public client metadata URL before building for production.',
-      );
-    }
-    return configuredClientId;
+    return configuredClientId ?? `${page.origin}/client-metadata.json`;
   }
 
   const redirect = new URL(origin);

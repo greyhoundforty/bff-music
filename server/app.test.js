@@ -1,11 +1,12 @@
 import assert from 'node:assert/strict'
-import { createServer } from 'node:http'
+import { createServer, request } from 'node:http'
 import { once } from 'node:events'
 import { mkdtemp, mkdir, writeFile, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 import test from 'node:test'
 import { createApp } from './app.js'
+import { clientMetadata, requestOrigin } from './metadata.js'
 
 async function withServer(distDir, fn) {
   const server = createServer(createApp({ distDir }))
@@ -64,10 +65,6 @@ test('serves files, client routes, and refuses to leave dist', async () => {
       assert.equal(clientRoute.status, 200)
       assert.match(await clientRoute.text(), /BFF/)
 
-      const metadata = await fetch(`${base}/client-metadata.json`)
-      assert.equal(metadata.status, 200)
-      assert.equal((await metadata.json()).client_name, 'BFF')
-
       const asset = await fetch(`${base}/assets/app.js`)
       assert.equal(asset.status, 200)
       assert.match(asset.headers.get('content-type'), /javascript/)
@@ -85,6 +82,56 @@ test('serves files, client routes, and refuses to leave dist', async () => {
     await rm(dir, { recursive: true })
     await rm(outside, { force: true })
   }
+})
+
+// fetch() refuses to set Host, so send the raw request.
+function getWithHeaders(base, pathname, headers) {
+  return new Promise((resolve, reject) => {
+    const req = request(new URL(pathname, base), { headers }, (res) => {
+      let body = ''
+      res.setEncoding('utf8')
+      res.on('data', (chunk) => (body += chunk))
+      res.on('end', () => resolve({ status: res.statusCode, body }))
+    })
+    req.on('error', reject)
+    req.end()
+  })
+}
+
+test('client metadata is built from the forwarded host, not a stale file', async () => {
+  const dir = await fixture()
+  try {
+    await withServer(dir, async (base) => {
+      const proxied = await getWithHeaders(base, '/client-metadata.json', {
+        Host: 'internal:8080',
+        'X-Forwarded-Proto': 'https',
+        'X-Forwarded-Host': 'bff.example',
+      })
+      assert.equal(proxied.status, 200)
+      const meta = JSON.parse(proxied.body)
+      assert.equal(meta.client_id, 'https://bff.example/client-metadata.json')
+      assert.deepEqual(meta.redirect_uris, ['https://bff.example/callback'])
+      assert.equal(meta.scope, 'atproto transition:generic')
+      assert.equal(meta.dpop_bound_access_tokens, true)
+
+      const direct = await getWithHeaders(base, '/client-metadata.json', { Host: 'bff.example:8443' })
+      assert.equal(JSON.parse(direct.body).client_uri, 'http://bff.example:8443')
+
+      const hostile = await getWithHeaders(base, '/client-metadata.json', { Host: 'evil.example/x?' })
+      assert.equal(hostile.status, 400)
+    })
+  } finally {
+    await rm(dir, { recursive: true })
+  }
+})
+
+test('APP_URL pins the metadata origin', () => {
+  const req = { headers: { host: 'ignored.example', 'x-forwarded-proto': 'http' } }
+  assert.equal(requestOrigin(req, 'https://bff.example/some/path'), 'https://bff.example')
+  assert.equal(
+    clientMetadata('https://bff.example').client_id,
+    'https://bff.example/client-metadata.json',
+  )
 })
 
 test('reports a missing build instead of an empty SPA', async () => {

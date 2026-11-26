@@ -19,8 +19,11 @@ describe('resolveClientId', () => {
     expect(resolveClientId('https://bff.example', configured)).toBe(configured);
   });
 
-  it('refuses a public host with no configured client id', () => {
-    expect(() => resolveClientId('https://bff.example')).toThrow(/VITE_OAUTH_CLIENT_ID/);
+  it('derives the client id from the public origin when none is configured', () => {
+    expect(resolveClientId('https://bff.example')).toBe('https://bff.example/client-metadata.json');
+    expect(resolveClientId('https://bff.example:8443/')).toBe(
+      'https://bff.example:8443/client-metadata.json',
+    );
   });
 
   it('ignores a baked-in production client id on loopback', () => {

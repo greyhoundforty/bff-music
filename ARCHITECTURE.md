@@ -121,6 +121,7 @@ mise run dev       # Vite dev server: http://127.0.0.1:5173. Sign in with a real
 mise run test      # Vitest suite + Node server tests
 mise run build     # typecheck and build the SPA into starter/dist
 mise run serve     # build, then serve starter/dist + /api with the Node server on :8080
+mise run serve:watch  # serve, then rebuild and restart on source changes (watchexec)
 mise run restart   # stop, rebuild, and serve again
 mise run stop      # stop the dev server or Node server
 ```
@@ -128,7 +129,7 @@ mise run stop      # stop the dev server or Node server
 
 The dev server binds `127.0.0.1` (RFC 8252 loopback redirects can't use `localhost`). Ports default to 5173 (`dev`) and 8080 (`serve`). When `$SESH_SESSION_PORT` is set, both use it instead. Sesh sets that variable per worktree session, so parallel sessions each get their own port. When the variable is set, Vite exits if the port is taken instead of moving to another one. The OAuth redirect comes from the page's origin, so any port works. `stop` only stops `node` processes listening on those ports, and Sesh runs it as teardown before deleting a worktree.
 
-For production: host `public/client-metadata.json` at your domain, set its `client_id`/`redirect_uris` to your origin, and set `VITE_OAUTH_CLIENT_ID` (see `oauth.ts`).
+For production, the image works at any URL with no build-time config. The Node server builds `/client-metadata.json` per request from the forwarded host (`server/metadata.js`), and on a public host the browser uses `<origin>/client-metadata.json` as its `client_id` (`oauth.ts`). Set `APP_URL` on the container to pin the origin. Set `VITE_OAUTH_CLIENT_ID` at build time only if the metadata is hosted elsewhere.
 
 ## Suggested build order (next phase)
 1. `src/lib/pick.ts` — implement `putPick`, `listMyPicks`, `deletePick` (signatures provided).

@@ -10,3 +10,4 @@ lexicons
 *.md
 fnox.toml
 dist
+**/*.local

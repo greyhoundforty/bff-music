@@ -1,4 +1,5 @@
 import { handleApi } from './api.js'
+import { handleClientMetadata } from './metadata.js'
 import { handleStatic } from './static.js'
 
 export function createApp({ distDir }) {
@@ -9,6 +10,11 @@ export function createApp({ distDir }) {
 
       if (pathname === '/api' || pathname.startsWith('/api/')) {
         handleApi(req, res, pathname)
+        return
+      }
+
+      if (pathname === '/client-metadata.json') {
+        handleClientMetadata(req, res)
         return
       }
 
