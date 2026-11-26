@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      {
+        "command": "/bin/bash .cursor/hooks/beads.sh sessionStart"
+      }
+    ],
+    "preCompact": [
+      {
+        "command": "/bin/bash .cursor/hooks/beads.sh preCompact"
+      }
+    ],
+    "postToolUse": [
+      {
+        "command": "/bin/bash .cursor/hooks/beads.sh postToolUse"
+      }
+    ]
+  }
+}

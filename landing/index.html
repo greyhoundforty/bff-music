@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Best · Favorite · First</title>
+  <meta name="description" content="Tag any artist with three albums: the peak, the one you love, and the one to start with.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=Instrument+Serif&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --page: #F1EADD;
+      --ink: #221F1B;
+      --ink-2: #3A352E;
+      --muted: #6A645A;
+      --hairline: #E3DBCC;
+      --best: #C2902F;
+      --fav: #CC6B52;
+      --first: #2E9E78;
+      --on-brand: #FBF6EA;
+      --display: "Instrument Serif", Georgia, serif;
+      --ui: "Hanken Grotesk", -apple-system, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--page);
+      color: var(--ink);
+      font-family: var(--ui);
+      font-size: 18px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    main {
+      width: min(1080px, calc(100% - 48px));
+      margin: 0 auto;
+      padding: 36px 0 72px;
+    }
+
+    .mark {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      margin: 0 0 56px;
+    }
+
+    .glyphs { display: flex; gap: 3px; }
+
+    .glyphs span {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--on-brand);
+      font-size: 11px;
+    }
+
+    .glyphs .best { background: var(--best); }
+    .glyphs .fav { background: var(--fav); }
+    .glyphs .first { background: var(--first); }
+
+    .mark strong {
+      font-family: var(--display);
+      font-weight: 400;
+      font-size: 28px;
+      letter-spacing: 0.2px;
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 12ch;
+      font-family: var(--display);
+      font-weight: 400;
+      font-size: clamp(48px, 7vw, 76px);
+      line-height: 0.92;
+      letter-spacing: -0.02em;
+    }
+
+    .blurb {
+      max-width: 38em;
+      margin: 22px 0 0;
+      color: var(--ink-2);
+    }
+
+    figure {
+      margin: 40px 0 0;
+    }
+
+    figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--hairline);
+      border-radius: 16px;
+      box-shadow: 0 1px 2px rgba(34, 31, 27, 0.05), 0 20px 50px rgba(34, 31, 27, 0.08);
+    }
+
+    figcaption {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .kinds {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px 32px;
+      margin: 36px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .kinds h2 {
+      margin: 0 0 6px;
+      font-family: var(--display);
+      font-weight: 400;
+      font-size: 28px;
+      line-height: 1;
+    }
+
+    .kinds h2 span {
+      display: inline-block;
+      width: 1.15em;
+    }
+
+    .kinds p {
+      margin: 0;
+      color: var(--ink-2);
+      font-size: 16px;
+      line-height: 1.45;
+    }
+
+    .kinds .best { color: var(--best); }
+    .kinds .fav { color: var(--fav); }
+    .kinds .first { color: var(--first); }
+
+    .keep {
+      max-width: 38em;
+      margin: 32px 0 0;
+      color: var(--muted);
+      font-size: 16px;
+    }
+
+    @media (max-width: 720px) {
+      main { width: min(1080px, calc(100% - 32px)); padding-top: 24px; }
+      .mark { margin-bottom: 36px; }
+      .kinds { grid-template-columns: 1fr; gap: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <p class="mark">
+      <span class="glyphs" aria-hidden="true">
+        <span class="best">★</span>
+        <span class="fav">♥</span>
+        <span class="first">①</span>
+      </span>
+      <strong>BFF</strong>
+    </p>
+
+    <h1>Three albums for every artist.</h1>
+    <p class="blurb">
+      Best Favorite First is a way to tag a catalog. For any artist you keep
+      one peak, one personal favorite, and one album you would hand a newcomer.
+      Discover shows what the people you follow are naming, and your profile
+      keeps a trio for each artist.
+    </p>
+
+    <figure>
+      <img src="discover.png" width="1140" height="586" alt="The Discover screen, with Best, Favorite, and First columns of album picks from people you follow.">
+      <figcaption>Discover, from the people you follow.</figcaption>
+    </figure>
+
+    <ul class="kinds">
+      <li>
+        <h2><span class="best" aria-hidden="true">★</span> Best</h2>
+        <p>The album you would call their peak.</p>
+      </li>
+      <li>
+        <h2><span class="fav" aria-hidden="true">♥</span> Favorite</h2>
+        <p>The one you actually reach for.</p>
+      </li>
+      <li>
+        <h2><span class="first" aria-hidden="true">①</span> First</h2>
+        <p>Where you would send a newcomer.</p>
+      </li>
+    </ul>
+
+    <p class="keep">
+      Sign in with a Bluesky handle, or any AT Protocol server. Each pick is stored in your own account.
+    </p>
+  </main>
+</body>
+</html>

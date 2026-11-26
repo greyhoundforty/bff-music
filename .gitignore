@@ -1,0 +1,8 @@
+starter/node_modules/
+starter/dist/
+starter/.vite/
+*.local
+.DS_Store
+
+# IBM Cloud container-registry API key. Local only.
+bff-icr-key.json

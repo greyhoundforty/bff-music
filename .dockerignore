@@ -1,0 +1,12 @@
+.git
+.gitignore
+.superpowers
+node_modules
+starter/node_modules
+starter/dist
+design
+docs
+lexicons
+*.md
+fnox.toml
+dist

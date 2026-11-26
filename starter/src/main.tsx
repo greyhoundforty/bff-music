@@ -1,10 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 
-// Ensure the app always runs on 127.0.0.1 in dev so the OAuth redirect_uri
-// and the page origin match — sessionStorage/localStorage are keyed by origin,
-// so localhost:port and 127.0.0.1:port are different buckets.
-if (import.meta.env.DEV && window.location.hostname === 'localhost') {
+// Loopback OAuth rejects "localhost" in redirect_uri, and storage is keyed by
+// origin, so localhost:port and 127.0.0.1:port must not diverge. This applies
+// to Vite and to the Node server.
+if (window.location.hostname === 'localhost') {
   window.location.replace(window.location.href.replace('localhost', '127.0.0.1'));
 }
 import { BrowserRouter } from 'react-router-dom';

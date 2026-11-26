@@ -4,19 +4,36 @@ import { BrowserOAuthClient } from '@atproto/oauth-client-browser';
 // read/write so we can putRecord / listRecords on app.bff.pick.
 export const OAUTH_SCOPE = 'atproto transition:generic';
 
-// In DEV, AT Protocol supports a "loopback" client: the client_id is
-// http://localhost with redirect_uri + scope passed as query params — no hosted
-// metadata required. In PROD, host /client-metadata.json and set
-// VITE_OAUTH_CLIENT_ID to its public URL (see public/client-metadata.json).
-// RFC 8252 forbids "localhost" in redirect_uri for loopback clients;
-// the PDS will reject it. Replace with 127.0.0.1 so the URI is valid.
-// Access the dev server at http://127.0.0.1:<port> (not localhost) so the
-// callback lands on the same origin that was registered.
-const devRedirectUri = window.location.origin.replace('localhost', '127.0.0.1') + '/callback';
+// Loopback clients (http://localhost?redirect_uri=...) need no hosted metadata.
+// RFC 8252 forbids "localhost" in redirect_uri, so the callback uses 127.0.0.1.
+// A production build served from a public host must set VITE_OAUTH_CLIENT_ID to
+// the https URL of client-metadata.json. That value is ignored on loopback so
+// `mise run serve` can sign in without a hosted client.
+const LOOPBACK_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]']);
 
-const clientId = import.meta.env.DEV
-  ? `http://localhost?redirect_uri=${encodeURIComponent(devRedirectUri)}&scope=${encodeURIComponent(OAUTH_SCOPE)}`
-  : (import.meta.env.VITE_OAUTH_CLIENT_ID as string);
+export function resolveClientId(origin: string, configuredClientId?: string): string {
+  const page = new URL(origin);
+  if (!LOOPBACK_HOSTS.has(page.hostname)) {
+    if (!configuredClientId) {
+      throw new Error(
+        'VITE_OAUTH_CLIENT_ID is not set. Set it to the public client metadata URL before building for production.',
+      );
+    }
+    return configuredClientId;
+  }
+
+  const redirect = new URL(origin);
+  if (redirect.hostname === 'localhost') redirect.hostname = '127.0.0.1';
+  redirect.pathname = '/callback';
+  redirect.search = '';
+  redirect.hash = '';
+  return `http://localhost?redirect_uri=${encodeURIComponent(redirect.toString())}&scope=${encodeURIComponent(OAUTH_SCOPE)}`;
+}
+
+const clientId = resolveClientId(
+  window.location.origin,
+  import.meta.env.VITE_OAUTH_CLIENT_ID || undefined,
+);
 
 // Cache the promise, not the resolved value, so concurrent callers await the
 // same load() call instead of spawning multiple BrowserOAuthClient instances.
