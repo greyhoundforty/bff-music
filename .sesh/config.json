@@ -1,5 +1,6 @@
 {
   "setup": "mise trust && mise install && cd starter && mise exec -- npm ci",
   "copy": ["starter/.env.local"],
+  "teardown": "mise run stop",
   "ports": 1
 }

@@ -41,7 +41,25 @@ depends = ["test:setup"]
 run = "npm run build"
 
 [tasks.serve]
-description = "Serve the built SPA with the Node backend on port 8080"
+description = "Build, then serve the SPA with the Node backend ($SESH_SESSION_PORT or 8080)"
 depends = ["build"]
 run = "node server/index.js"
-env = { HOST = "0.0.0.0", PORT = "8080" }
+env = { HOST = "0.0.0.0", PORT = "{{ get_env(name='SESH_SESSION_PORT', default='8080') }}" }
+
+# Stops only node processes listening on this app's ports: the Sesh session
+# port when set, otherwise the Vite (5173) and server (8080) defaults.
+[tasks.stop]
+description = "Stop the running dev server or Node server"
+run = '''
+for port in ${SESH_SESSION_PORT:-5173 8080}; do
+  pids=$(lsof -a -c node -ti "tcp:$port" -sTCP:LISTEN 2>/dev/null || true)
+  if [ -n "$pids" ]; then
+    echo "stopping node on :$port (pid $pids)"
+    kill $pids
+  fi
+done
+'''
+
+[tasks.restart]
+description = "Stop whatever is running, rebuild, and serve again"
+run = ["mise run stop", "mise run serve"]
