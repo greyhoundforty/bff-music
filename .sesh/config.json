@@ -1,0 +1,5 @@
+{
+  "setup": "mise trust && mise install && cd starter && mise exec -- npm ci",
+  "copy": ["starter/.env.local"],
+  "ports": 1
+}
