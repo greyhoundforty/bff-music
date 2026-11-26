@@ -1,4 +1,5 @@
 import { type FormEvent, useState } from 'react';
+import HandleTypeahead from '../components/HandleTypeahead';
 import { useSession } from '../lib/session';
 
 /**
@@ -86,32 +87,21 @@ export default function Login() {
             <div style={{
               display: 'flex', alignItems: 'center',
               border: `1.5px solid ${error ? 'var(--fav)' : 'var(--ink)'}`,
-              borderRadius: 'var(--r-input)', overflow: 'hidden',
+              borderRadius: 'var(--r-input)',
+              // Positions the handle dropdown; no overflow clipping so it can
+              // hang below the field (the @ addon rounds its own corners).
+              position: 'relative',
               marginBottom: error ? 8 : 16, background: '#fff',
             }}>
               <span style={{
                 padding: '11px 12px',
                 background: 'var(--page-bg)',
+                borderRadius: 'calc(var(--r-input) - 1.5px) 0 0 calc(var(--r-input) - 1.5px)',
                 borderRight: '1.5px solid var(--hairline-2)',
                 fontFamily: 'var(--font-mono)', fontSize: 15,
                 color: 'var(--muted)', flexShrink: 0,
               }}>@</span>
-              <input
-                type="text"
-                value={handle}
-                onChange={e => setHandle(e.target.value)}
-                placeholder="you.bsky.social"
-                autoComplete="username"
-                autoCapitalize="none"
-                spellCheck={false}
-                disabled={pending}
-                style={{
-                  flex: 1, border: 'none', outline: 'none',
-                  padding: '11px 13px', fontSize: 16,
-                  fontFamily: 'var(--font-ui)', color: 'var(--ink)',
-                  background: 'transparent', minWidth: 0,
-                }}
-              />
+              <HandleTypeahead value={handle} onChange={setHandle} disabled={pending} />
             </div>
 
             {error && (
