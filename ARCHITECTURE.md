@@ -114,12 +114,20 @@ starter/
 ```
 
 ## Run steps
+Tasks live in `mise.toml` at the repo root and run from there. mise also provides Node.
 ```bash
-cd starter
-npm install
-npm run dev      # http://127.0.0.1:5173  — sign in with a real Bluesky handle (dev loopback client)
+mise trust && mise install   # once: trust the config and install Node
+mise run dev       # Vite dev server: http://127.0.0.1:5173. Sign in with a real Bluesky handle (dev loopback client)
+mise run test      # Vitest suite + Node server tests
+mise run build     # typecheck and build the SPA into starter/dist
+mise run serve     # build, then serve starter/dist + /api with the Node server on :8080
+mise run restart   # stop, rebuild, and serve again
+mise run stop      # stop the dev server or Node server
 ```
-The dev server binds `127.0.0.1` (RFC 8252 loopback redirects can't use `localhost`). The port is 5173 by default, or `$SESH_SESSION_PORT` when set. Sesh sets that variable per worktree session, so parallel sessions each get their own port. When the variable is set, Vite exits if the port is taken instead of moving to another one. The OAuth redirect comes from the page's origin, so any port works.
+`dev`, `test`, `build` and `serve` run `npm ci` in `starter/` first, but only when `package.json` or `package-lock.json` changed.
+
+The dev server binds `127.0.0.1` (RFC 8252 loopback redirects can't use `localhost`). Ports default to 5173 (`dev`) and 8080 (`serve`). When `$SESH_SESSION_PORT` is set, both use it instead. Sesh sets that variable per worktree session, so parallel sessions each get their own port. When the variable is set, Vite exits if the port is taken instead of moving to another one. The OAuth redirect comes from the page's origin, so any port works. `stop` only stops `node` processes listening on those ports, and Sesh runs it as teardown before deleting a worktree.
+
 For production: host `public/client-metadata.json` at your domain, set its `client_id`/`redirect_uris` to your origin, and set `VITE_OAUTH_CLIENT_ID` (see `oauth.ts`).
 
 ## Suggested build order (next phase)
